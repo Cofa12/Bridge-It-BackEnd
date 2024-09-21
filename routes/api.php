@@ -14,6 +14,10 @@ Route::group(['middleware'=>'sanitizedCredentials'],function (){
     Route::post('/register',[AuthController::class,'Register']);
     Route::post('/login',[AuthController::class,'login']);
 });
+
+    Route::get('/register/twitter',[AuthController::class,'providerRegisterTwitter'])->middleware('web');
+    Route::get('register/twitter/redirection',[AuthController::class,'providerRegisterRedirectionTwitter'])->middleware('web');
+    
     Route::get('/register/{provider}',[AuthController::class,'providerRegister']);
     Route::get('register/{provider}/redirection',[AuthController::class,'providerRegisterRedirection']);
     Route::post('/email/forget',[AuthController::class,'requireOTP']);

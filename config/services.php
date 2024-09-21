@@ -26,10 +26,10 @@ return [
         'redirect' => 'http://127.0.0.1/api/register/github/redirection'
     ],
 
-    'linkedin'=>[
-        'client_id'=>env('LINKEDIN_CLIENT_ID'),
-        'client_secret'=>env('LINKEDIN_CLIENT_ID_CLIENT_SECRET'),
-        'redirect' => 'http://127.0.0.1/api/register/linkedin/redirection'
+    'twitter'=>[
+        'client_id'=>env('TWITTER_CLIENT_ID'),
+        'client_secret'=>env('TWITTER_CLIENT_SECRET'),
+        'redirect' => 'http://127.0.0.1/api/register/twitter/redirection'
     ],
 
     'postmark' => [
