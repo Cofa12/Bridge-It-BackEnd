@@ -73,51 +73,23 @@ class AuthController extends Controller
             return view('mails.verified');
         }
     }
-
-
-    public function providerRegisterTwitter(){
-        return Socialite::driver('twitter')->redirect();
-    }
-    public function providerRegisterRedirectionTwitter(){
-        try {
-            $user = Socialite::driver('twitter')->user();
-        } catch (ClientException $exception) {
-            return response()->json(['status'=>false,'error' => 'Invalid credentials provided.'], 422);
-        }
-
-        try {
-            User::firstOrCreate([
-                'user_id' => "$user->id",
-                'name' => $user->name,
-                'email' => $user->email,
-                'avatar' => $user->avatar,
-                'email_verified_at' => now()
-            ]);
-        }catch (UniqueConstraintViolationException $e){
-            return response()->json([
-                'status'=>false,
-                'message'=>'this email exists'
-            ],422);
-        }
-
-        $storedUserInDB = User::where('email',$user->email)->first();
-        $token = $storedUserInDB->createToken('user_token')->plainTextToken;
-        $storedUserInDB->token=$token;
-        return response()->json([
-            'status'=>true,
-            'User'=>$storedUserInDB
-        ],200);
-
-    }
-
-
+    
 
     public function providerRegister($provider){
-        return Socialite::driver($provider)->stateless()->redirect();
+        if($provider=='twitter'){
+            return Socialite::driver($provider)->redirect();
+        }else{
+            return Socialite::driver($provider)->stateless()->redirect();
+        }
+
     }
     public function providerRegisterRedirection($provider){
         try {
-            $user = Socialite::driver($provider)->stateless()->user();
+            if($provider=='twitter'){
+                $user = Socialite::driver($provider)->user();
+            }else{
+                $user = Socialite::driver($provider)->stateless()->user();
+            }
         } catch (ClientException $exception) {
             return response()->json(['status'=>false,'error' => 'Invalid credentials provided.'], 422);
         }
