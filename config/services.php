@@ -17,19 +17,29 @@ return [
     'google'=>[
       'client_id'=>env('GOOGLE_CLIENT_ID'),
       'client_secret'=>env('GOOGLE_CLIENT_SECRET'),
-      'redirect' => 'http://127.0.0.1/api/register/google/redirection'
+      'redirect' => 'http://127.0.0.1:8000/api/register/google/redirection'
     ],
 
     'github'=>[
         'client_id'=>env('GITHUB_CLIENT_ID'),
         'client_secret'=>env('GITHUB_CLIENT_SECRET'),
-        'redirect' => 'http://127.0.0.1/api/register/github/redirection'
+        'redirect' => 'http://127.0.0.1:8000/api/register/github/redirection'
     ],
 
     'twitter'=>[
         'client_id'=>env('TWITTER_CLIENT_ID'),
         'client_secret'=>env('TWITTER_CLIENT_SECRET'),
-        'redirect' => 'http://127.0.0.1/api/register/twitter/redirection'
+        'redirect' =>'http://127.0.0.1:8000/api/register/twitter/redirection'
+
+    ],
+
+
+    'facebook' => [
+        'client_id' => env('FACEBOOK_CLIENT_ID'),
+        'client_secret' => env('FACEBOOK_CLIENT_SECRET'),
+        'redirect' =>'http://localhost:8000/api/register/facebook/redirection',
+        'scopes' => ['email'], 
+        'fields' => ['id', 'name', 'email', 'avatar'],
     ],
 
     'postmark' => [

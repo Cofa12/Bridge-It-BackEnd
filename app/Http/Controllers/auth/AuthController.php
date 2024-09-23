@@ -74,44 +74,27 @@ class AuthController extends Controller
     }
 
 
-    public function providerRegisterTwitter(){
-        return Socialite::driver('twitter')->redirect();
-    }
-    public function providerRegisterRedirectionTwitter(){
-        try {
-            $user = Socialite::driver('twitter')->user();
-        } catch (ClientException $exception) {
-            return response()->json(['status'=>false,'error' => 'Invalid credentials provided.'], 422);
-        }
 
-        User::firstOrCreate([
-            'user_id'=>"$user->id",
-            'name'=>$user->name,
-            'email'=>$user->email,
-            'avatar'=>$user->avatar,
-            'email_verified_at'=>now()
-        ]);
-
-        $storedUserInDB = User::where('email',$user->email)->first();
-        $token = $storedUserInDB->createToken('user_token')->plainTextToken;
-        $storedUserInDB->token=$token;
-        return response()->json([
-            'status'=>true,
-            'User'=>$storedUserInDB
-        ],200);
-
-    }
 
 
 
 
 
     public function providerRegister($provider){
+        if($provider == 'twitter'){
+
+            return Socialite::driver($provider)->redirect();
+        }
         return Socialite::driver($provider)->stateless()->redirect();
     }
     public function providerRegisterRedirection($provider){
         try {
-            $user = Socialite::driver($provider)->stateless()->user();
+            if($provider == 'twitter'){
+                $user = Socialite::driver($provider)->user();
+            }else{
+                $user = Socialite::driver($provider)->stateless()->user();
+                dd($user);
+            }
         } catch (ClientException $exception) {
             return response()->json(['status'=>false,'error' => 'Invalid credentials provided.'], 422);
         }
