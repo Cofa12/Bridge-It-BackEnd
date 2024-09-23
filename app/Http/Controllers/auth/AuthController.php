@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Notifications\SendOTPcode;
 use App\Notifications\SendVerificationEmail;
 use GuzzleHttp\Exception\ClientException;
+use http\Env\Response;
 use Illuminate\Auth\SessionGuard;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\Request;
@@ -84,13 +85,20 @@ class AuthController extends Controller
             return response()->json(['status'=>false,'error' => 'Invalid credentials provided.'], 422);
         }
 
-        User::firstOrCreate([
-            'user_id'=>"$user->id",
-            'name'=>$user->name,
-            'email'=>$user->email,
-            'avatar'=>$user->avatar,
-            'email_verified_at'=>now()
-        ]);
+        try {
+            User::firstOrCreate([
+                'user_id' => "$user->id",
+                'name' => $user->name,
+                'email' => $user->email,
+                'avatar' => $user->avatar,
+                'email_verified_at' => now()
+            ]);
+        }catch (UniqueConstraintViolationException $e){
+            return response()->json([
+                'status'=>false,
+                'message'=>'this email exists'
+            ],422);
+        }
 
         $storedUserInDB = User::where('email',$user->email)->first();
         $token = $storedUserInDB->createToken('user_token')->plainTextToken;
@@ -104,8 +112,6 @@ class AuthController extends Controller
 
 
 
-
-
     public function providerRegister($provider){
         return Socialite::driver($provider)->stateless()->redirect();
     }
@@ -116,14 +122,20 @@ class AuthController extends Controller
             return response()->json(['status'=>false,'error' => 'Invalid credentials provided.'], 422);
         }
 
-        User::firstOrCreate([
-            'user_id'=>"$user->id",
-            'name'=>$user->name,
-            'email'=>$user->email,
-            'avatar'=>$user->avatar,
-            'email_verified_at'=>now()
-        ]);
-
+        try {
+            User::firstOrCreate([
+                'user_id' => "$user->id",
+                'name' => $user->name,
+                'email' => $user->email,
+                'avatar' => $user->avatar,
+                'email_verified_at' => now()
+            ]);
+        }catch (UniqueConstraintViolationException $e){
+            return response()->json([
+                'status'=>false,
+                'message'=>'this email exists'
+            ],422);
+        }
         $storedUserInDB = User::where('email',$user->email)->first();
         $token = $storedUserInDB->createToken('user_token')->plainTextToken;
         $storedUserInDB->token=$token;

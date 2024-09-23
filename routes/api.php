@@ -14,7 +14,6 @@ Route::group(['middleware'=>'sanitizedCredentials'],function (){
     Route::post('/register',[AuthController::class,'Register']);
     Route::post('/login',[AuthController::class,'login']);
 });
-
     Route::get('/register/twitter',[AuthController::class,'providerRegisterTwitter'])->middleware('web');
     Route::get('register/twitter/redirection',[AuthController::class,'providerRegisterRedirectionTwitter'])->middleware('web');
 
