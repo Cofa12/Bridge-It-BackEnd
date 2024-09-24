@@ -98,14 +98,19 @@ class AuthController extends Controller
         } catch (ClientException $exception) {
             return response()->json(['status'=>false,'error' => 'Invalid credentials provided.'], 422);
         }
+        try{
+            User::firstOrCreate([
+                'user_id'=>"$user->id",
+                'name'=>$user->name,
+                'email'=>$user->email,
+                'avatar'=>$user->avatar,
+                'email_verified_at'=>now()
+            ]);
 
-        User::firstOrCreate([
-            'user_id'=>"$user->id",
-            'name'=>$user->name,
-            'email'=>$user->email,
-            'avatar'=>$user->avatar,
-            'email_verified_at'=>now()
-        ]);
+        }catch(UniqueConstraintViolationException){
+            return response()->json(['status'=>false,'error' => 'This email is already exist.'], 422);
+        }
+
 
         $storedUserInDB = User::where('email',$user->email)->first();
         $token = $storedUserInDB->createToken('user_token')->plainTextToken;
