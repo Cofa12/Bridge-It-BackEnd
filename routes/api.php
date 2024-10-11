@@ -26,6 +26,6 @@ Route::group(['middleware'=>'sanitizedCredentials'],function (){
     Route::get('Email/Confirm/',[AuthController::class,'confirmEmail'])->name('confirmEmail');
     Route::post('Email/supscriptors',[AuthController::class,'supscription']);
     Route::get('Email/forAllSupscriptors',[AuthController::class,'sendSubscriptors']);
-
+//
 
 

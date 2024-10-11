@@ -295,6 +295,7 @@ class AuthController extends Controller
         'status' => true,
         'message' => 'Your has been subscriber successfully',
         ], 200);
+        //
 
     }
 
