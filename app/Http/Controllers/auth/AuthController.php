@@ -291,7 +291,10 @@ class AuthController extends Controller
         {
             Mail::to($email)->send(new NotifySubscriptors($content, $subject));
         }
-
+        return response()->json([
+        'status' => true,
+        'message' => 'Your has been subscriber successfully',
+        ], 200);
 
     }
 
