@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\auth;
 
 use App\Http\Controllers\Controller;
+use App\Mail\NotifySubscriptors;
 use App\Models\User;
 use App\Notifications\SendOTPcode;
 use App\Notifications\SendVerificationEmail;
@@ -15,6 +16,7 @@ use Illuminate\Support\Facades\Auth;
 //use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Socialite\Facades\Socialite;
@@ -260,7 +262,7 @@ class AuthController extends Controller
     public function supscription(Request $request): \Illuminate\Http\JsonResponse
     {
         $validator = validator::make($request->all(), [
-            'email' => 'email|required|exists:users'
+            'email' => 'email|required|unique:subscriptors,email',
         ]);
 
         if ($validator->fails()) {
@@ -275,12 +277,21 @@ class AuthController extends Controller
 //        mail($request->input('email'));
         return response()->json([
             'status' => true,
-            'message' => 'Your account has been suspended successfully',
+            'message' => 'Your has been subscriber successfully',
         ], 200);
     }
 
-    public function sendSupscriptor(Request $request): void
+    public function sendSubscriptors()
     {
+        $content="lab lab lab";
+        $subject = "cr7 a7sn mn messi";
+        $subscriptorsEmails = DB::table('subscriptors')->get('email')->toArray();
+        Mail::to('abdelaziz.nassar@gmail.com')->send(new NotifySubscriptors($content, $subject));
+//        foreach ($subscriptorsEmails as $email)
+//        {
+//            Mail::to($email)->send(new NotifySubscriptors($content, $subject));
+//        }
+
 
     }
 
