@@ -286,11 +286,11 @@ class AuthController extends Controller
         $content="lab lab lab";
         $subject = "cr7 a7sn mn messi";
         $subscriptorsEmails = DB::table('subscriptors')->get('email')->toArray();
-        Mail::to('abdelaziz.nassar@gmail.com')->send(new NotifySubscriptors($content, $subject));
-//        foreach ($subscriptorsEmails as $email)
-//        {
-//            Mail::to($email)->send(new NotifySubscriptors($content, $subject));
-//        }
+//        Mail::to('abdelaziz.nassar@gmail.com')->send(new NotifySubscriptors($content, $subject));
+        foreach ($subscriptorsEmails as $email)
+        {
+            Mail::to($email)->send(new NotifySubscriptors($content, $subject));
+        }
 
 
     }
