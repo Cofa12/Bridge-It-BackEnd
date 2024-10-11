@@ -38,11 +38,11 @@ class AuthController extends Controller
             ],422);
         }
         try {
-            Notification::route('mail',$request->email)->notify(new SendVerificationEmail($request->email));
+//            Notification::route('mail',$request->email)->notify(new SendVerificationEmail($request->email));
             $user = User::create([
                 'name'=>$request->name,
                 'email'=>$request->email,
-                'password'=>Hash::make($request->password),
+                'password'=>$request['password'],
                 'type'=> $request->type != '' ? $request->type : 'regular',
                 'phone'=> $request->phone != '' ? $request->phone : null,
             ]);
@@ -67,7 +67,7 @@ class AuthController extends Controller
             'email_verified_at'=> now()
         ]);
 
-        echo $request->get('email');
+//        echo $request->get('email');
 
         if($user){
             return view('mails.verified');
@@ -107,7 +107,7 @@ class AuthController extends Controller
 
         } finally {
             $storedUserInDB = User::where('email',$user->email)->first();
-            if($storedUserInDB->password){
+            if(isset($storedUserInDB->password)&&$storedUserInDB->password){
                 return response()->json([
                     'message'=>[
                         'error'=>'Need To Enter Password'
@@ -142,12 +142,14 @@ class AuthController extends Controller
         }
 
 
+        // see this bug
         $user = Auth::attempt($request->only(['email','password']));
+
         if(!$user){
             return response()->json([
-                'status'=>false,
-                'message'=>'Email or password is not correct'
-            ],401);
+                'status' => false,
+                'message' => 'Email or password is not correct'
+            ], 401);
         }
 
         $user = User::where('email',$request->email)->whereNotNull('email_verified_at')->first();
