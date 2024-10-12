@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\landing;
 
 use App\Http\Controllers\Controller;
+use App\Mail\NotifySubscriptors;
 use App\Models\Question;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 
 class LandingPageController extends Controller
@@ -29,6 +32,39 @@ class LandingPageController extends Controller
         return response()->json([
             'status'=>true,
         ],201);
+
+    }
+
+    public function getSubscription(Request $request){
+        $validator=validator($request->all(),[
+            'email'=>'required|email|unique:subscriptors,email'
+        ]);
+        if($validator->fails()){
+            return response()->json([
+                'status'=>false,
+                'message'=>$validator->errors(),
+            ],422);
+        }
+        DB::table('subscriptors')->insert(['email'=>$request->input('email')]);
+        return response()->json([
+            'status'=>true,
+            'message'=>'Thank you for subscribing to our newsletter'
+        ]);
+    }
+
+    public function sendSubscription()
+    {
+        $content='123456';
+        $subject='654321';
+        $emails=DB::table('subscriptors')->pluck('email');
+        foreach ($emails as $email) {
+            Mail::to($email)->send(new NotifySubscriptors($content,$subject));
+        }
+        return response()->json([
+            'status'=>true,
+            'message'=>'all subscriptors have been sent '
+        ]);
+
 
     }
 }

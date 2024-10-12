@@ -33,3 +33,5 @@ Route::group(['middleware'=>'sanitizedCredentials'],function (){
     //landing pages routes
     Route::get('/questions',[LandingPageController::class,'getQuestions']);
     Route::put('/questions/up',[LandingPageController::class,'addPoint']);
+    Route::post('/subscription',[LandingPageController::class,'getSubscription']);
+    Route::get('/subscription/send',[LandingPageController::class,'sendSubscription']);
