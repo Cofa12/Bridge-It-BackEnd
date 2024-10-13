@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Notifications\SendOTPcode;
 use App\Notifications\SendVerificationEmail;
+use App\SaveSocialiteData;
 use GuzzleHttp\Exception\ClientException;
 use http\Env\Response;
 use Illuminate\Auth\SessionGuard;
@@ -13,7 +14,9 @@ use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 //use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Socialite\Facades\Socialite;
@@ -22,6 +25,7 @@ use Ichtrojan\Otp\Otp;
 class AuthController extends Controller
 {
     //
+    use SaveSocialiteData;
     public function Register(Request $request){
         $validator = validator::make($request->all(),[
             'name'=>'required|string|max:40',
@@ -115,6 +119,8 @@ class AuthController extends Controller
                 ],406);
             }
             $token = $storedUserInDB->createToken('user_token')->plainTextToken;
+            Cache::store('database')->put('user',$storedUserInDB,600);
+            Cache::store('database')->put('token',$token,600);
             return response()->json([
                 "data"=>[
                     "user"=> $storedUserInDB
@@ -127,6 +133,19 @@ class AuthController extends Controller
             ],201);
         }
     }
+
+    public function getCredentialsUser(){
+
+        return response()->json([
+            "data"=>[
+                "user"=> Cache::store('database')->get('user'),
+            ],
+            "token"=>[
+                "access_token"=>Cache::store('database')->get('token'),
+                "type"=>"Bearer",
+                "expires_in"=>"infinity"
+            ]
+        ],201);    }
     public function login(Request $request){
         $validator = validator::make($request->all(),[
             'email'=>'required|email',
