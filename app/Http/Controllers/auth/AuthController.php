@@ -42,7 +42,7 @@ class AuthController extends Controller
             ],422);
         }
         try {
-//            Notification::route('mail',$request->email)->notify(new SendVerificationEmail($request->email));
+            Notification::route('mail',$request->email)->notify(new SendVerificationEmail($request->email));
             $user = User::create([
                 'name'=>$request->name,
                 'email'=>$request->email,
