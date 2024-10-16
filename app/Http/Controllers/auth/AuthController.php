@@ -42,7 +42,6 @@ class AuthController extends Controller
             ],422);
         }
         try {
-            Notification::route('mail',$request->email)->notify(new SendVerificationEmail($request->email));
             $user = User::create([
                 'name'=>$request->name,
                 'email'=>$request->email,
@@ -50,6 +49,7 @@ class AuthController extends Controller
                 'type'=> $request->type != '' ? $request->type : 'regular',
                 'phone'=> $request->phone != '' ? $request->phone : null,
             ]);
+            Notification::route('mail',$request->email)->notify(new SendVerificationEmail($request->email));
         }catch (UniqueConstraintViolationException $e){
             return response()->json([
                 'status'=>false,
