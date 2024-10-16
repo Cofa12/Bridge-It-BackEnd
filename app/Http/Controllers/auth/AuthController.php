@@ -82,10 +82,9 @@ class AuthController extends Controller
     public function providerRegister($provider){
         if($provider=='twitter'){
             return Socialite::driver($provider)->redirect();
-        }else{
+       }else{
             return Socialite::driver($provider)->stateless()->redirect();
         }
-
     }
     public function providerRegisterRedirection($provider){
         try {
@@ -112,6 +111,7 @@ class AuthController extends Controller
         } finally {
             $storedUserInDB = User::where('email',$user->email)->first();
             if(isset($storedUserInDB->password)&&$storedUserInDB->password){
+                Cache::store('database')->put('message',"need to enter password",600);
                 return response()->json([
                     'message'=>[
                         'error'=>'Need To Enter Password'
@@ -135,7 +135,13 @@ class AuthController extends Controller
     }
 
     public function getCredentialsUser(){
-
+        if(Cache::store('database')->has('message')){
+            return response()->json([
+                'message'=>[
+                    'error'=>'Need To Enter Password'
+                ]
+            ],406);
+        }
         return response()->json([
             "data"=>[
                 "user"=> Cache::store('database')->get('user'),
