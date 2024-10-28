@@ -35,6 +35,39 @@ class LandingPageController extends Controller
 
     }
 
+    public function addQuestion(Request $request){
+        $validator = validator($request->all(),[
+            'email'=>'Email',
+            'name'=>'String',
+            'question'=>'required',
+            'subject'=>'String'
+        ]);
+
+        if($validator->fails()){
+            return response()->json([
+                'status'=>false,
+                'message'=>$validator->errors(),
+            ],422);
+        }
+
+        $isStoredInDatabase = Question::create([
+            'email'=>$request->email!=null? $request->email: "",
+            'name'=>$request->name!=null? $request->name: "",
+            'question'=>$request->question,
+            'subject'=>$request->subject!=null? $request->subject: ""
+        ]);
+
+        if(!$isStoredInDatabase){
+            return response()->json([
+                'message'=>'the recored wasn\'t sorted in database'
+            ],500);
+        }
+
+        return response()->json([
+            'message'=>'the recored was sorted in database successfully'
+        ],201);
+    }
+
     public function getSubscription(Request $request){
         $validator=validator($request->all(),[
             'email'=>'required|email|unique:subscriptors,email'
@@ -57,7 +90,7 @@ class LandingPageController extends Controller
         $content='123456';
         $subject='654321';
         $emails=DB::table('subscriptors')->pluck('email');
-        foreach ($emails as $email) {
+            foreach ($emails as $email) {
             Mail::to($email)->send(new NotifySubscriptors($content,$subject));
         }
         return response()->json([

@@ -19,8 +19,8 @@ Route::group(['middleware'=>'sanitizedCredentials'],function (){
 
 
     Route::get('/register/{provider}',[AuthController::class,'providerRegister']);
-    Route::get('register/{provider}/redirection',[AuthController::class,'providerRegisterRedirection']);
-    Route::get('/credentials/fetch/',[AuthController::class,'getCredentialsUser']);
+    Route::get('/register/{provider}/redirection',[AuthController::class,'providerRegisterRedirection']);
+    Route::get('/credentials/fetch/',[AuthController::class,'getCredentialsUser'])->name('credentials');
 
     Route::post('/email/forget/requireOTP',[AuthController::class,'requireOTP']);
     Route::post('/email/forget/checkOTP',[AuthController::class,'validateOTP']);
@@ -33,6 +33,7 @@ Route::group(['middleware'=>'sanitizedCredentials'],function (){
 
     //landing pages routes
     Route::get('/questions',[LandingPageController::class,'getQuestions']);
+    Route::post('/question/add',[LandingPageController::class,'addQuestion']);
     Route::put('/questions/up',[LandingPageController::class,'addPoint']);
     Route::post('/subscription',[LandingPageController::class,'getSubscription']);
     Route::get('/subscription/send',[LandingPageController::class,'sendSubscription']);

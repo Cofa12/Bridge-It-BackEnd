@@ -80,13 +80,13 @@ class AuthController extends Controller
 
 
     public function providerRegister($provider){
-        $url = Socialite::driver('google')->stateless()->redirect()->getTargetUrl();
-        return response()->json(['url' => $url]);
-//        if($provider=='twitter'){
-//            return Socialite::driver($provider)->redirect();
-//       }else{
-//            return Socialite::driver($provider)->stateless()->redirect();
-//        }
+//        $url = Socialite::driver('google')->stateless()->redirect()->getTargetUrl();
+//        return response()->json(['url' => $url]);
+        if($provider=='twitter'){
+            return Socialite::driver($provider)->redirect();
+       }else{
+            return Socialite::driver($provider)->stateless()->redirect();
+        }
     }
     public function providerRegisterRedirection($provider){
         try {
