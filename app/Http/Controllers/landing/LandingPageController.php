@@ -14,7 +14,7 @@ class LandingPageController extends Controller
 {
     //
     public function getQuestions(){
-        $questions = Question::all();
+        $questions = Question::all()->sortBy('points',0,true);
         foreach($questions as $question){
             $question->answer = $question->answers()->value('answer');
         }
