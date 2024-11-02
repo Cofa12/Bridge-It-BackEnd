@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\auth\AuthController;
 use Laravel\Socialite\Facades\Socialite;
 use App\Http\Controllers\landing\LandingPageController;
+use App\Http\Controllers\group\GroupController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -37,3 +38,7 @@ Route::group(['middleware'=>'sanitizedCredentials'],function (){
     Route::put('/questions/up',[LandingPageController::class,'addPoint']);
     Route::post('/subscription',[LandingPageController::class,'getSubscription']);
     Route::get('/subscription/send',[LandingPageController::class,'sendSubscription']);
+
+
+    // group routes
+    Route::apiResource('/group',GroupController::class);

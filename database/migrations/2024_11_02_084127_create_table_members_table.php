@@ -11,10 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('task_steps', function (Blueprint $table) {
-            $table->id();
-            $table->string('content');
-            $table->enum('status',['checked','unchecked'])->default('unchecked');
+        Schema::create('table_members', function (Blueprint $table) {
+            $table->foreignId('group_id')->references('id')->on('groups');
+            $table->foreignId('user_id')->references('id')->on('users');
+            $table->primary(['group_id','user_id']);
+            $table->enum('position',['admin','member']);
             $table->timestamps();
         });
     }
@@ -24,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('task_steps');
+        Schema::dropIfExists('table_members');
     }
 };
