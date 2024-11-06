@@ -46,8 +46,9 @@ Route::group(['middleware'=>'sanitizedCredentials'],function (){
     Route::group(['middleware'=>'auth:sanctum'],function (){
        Route::get('/groups',[GroupController::class,'index']);
         Route::post('/groups/store',[GroupController::class,'store']);
-        Route::delete('/groups/destroy',[GroupController::class,'destroy']);
-        Route::put('/groups/update',[GroupController::class,'update']);
+
+        Route::delete('/groups/destroy',[GroupController::class,'destroy'])->middleware(['isFoundGroup','isAdmin']);
+        Route::put('/groups/update',[GroupController::class,'update'])->middleware(['isFoundGroup','isAdmin']);
         Route::post('/groups/searchedGroups',[GroupController::class,'searchUsingName']);
-        Route::get('/groups/group{id}',[GroupController::class,'getGroupWithID']);
+        Route::get('/groups/{id}',[GroupController::class,'getGroupWithID']);
     });
