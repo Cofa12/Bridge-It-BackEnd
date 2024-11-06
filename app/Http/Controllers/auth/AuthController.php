@@ -25,7 +25,7 @@ use Ichtrojan\Otp\Otp;
 class AuthController extends Controller
 {
     //
-    use SaveSocialiteData;
+//    use SaveSocialiteData;
     public function Register(Request $request){
         $validator = validator::make($request->all(),[
             'name'=>'required|string|max:40',

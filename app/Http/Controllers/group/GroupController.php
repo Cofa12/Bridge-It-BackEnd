@@ -75,7 +75,7 @@ class GroupController extends Controller
             'status'=>true,
             'group'=>$group,
 
-        ],200);
+        ],201);
 
     }
 
@@ -94,10 +94,12 @@ class GroupController extends Controller
             ]);
         }
 //        dd($group);
-        $members = $group->user;
+        $members = $group->users;
+//        dd($members);
         return response()->json([
             'status'=>true,
             'group'=>$group,
+//            'members'=>$members,
         ]);
 
     }
@@ -122,23 +124,10 @@ class GroupController extends Controller
     public function update(Request $request): \Illuminate\Http\JsonResponse
     {
         //
-        $groupId=$request->input('group_id');
-//        dd($groupId);
+        $groupId=$request->input('groupId');
         $group=Group::find($groupId);
-        if(!$group){
-            return response()->json([
-                'status'=>false,
-                'message'=>'group not found'
-            ]);
-        }
 
 
-        if(!$this->isAdmin(Auth::id(),$groupId)){
-            return response()->json([
-                'status'=>false,
-                'message'=>'you are not admin to update in this group'
-            ]);
-        }
         $validator=validator($request->all(),[
             'title' => 'required|string|max:255',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
@@ -171,26 +160,11 @@ class GroupController extends Controller
      */
     public function destroy(Request $request): \Illuminate\Http\JsonResponse
     {
-        //
         $userId = Auth::id();
 
-        $groupId=$request->input('group_id');
-        $group=Group::find($groupId);
-//        dd($group);
-        if(!$group){
-            return response()->json([
-                'status'=>false,
-                'message'=>'group not found'
-            ]);
-        }
+        $groupId=$request->input('groupId');
+       $group=Group::find($groupId);
 
-//        dd($this->isAdmin($userId,$groupId));
-        if(!$this->isAdmin($userId,$groupId)){
-            return response()->json([
-                'status'=>false,
-                'message'=>'You cannot delete this group you are Not Admin in it'
-            ]);
-        }
         // delete every user in the pivot belongs to the $group and delete the group
         $usersInGroup=$group->users->pluck('id')->toArray();
         $group->users()->detach($usersInGroup);
@@ -212,20 +186,7 @@ class GroupController extends Controller
 
 
     }
-    public function isAdmin(int $userId,int $groupId): bool
-    {
-//        dd($userId);2
-//        dd($groupId);19
-            $value=DB::table('group_user')
-            ->where('group_id',$groupId)
-            ->where('user_id',$userId)
-            ->where('position','admin')->first();
 
-
-        return $value?true:false;
-
-
-    }
     public function getGroupMembers(int $groupId): \Illuminate\Http\JsonResponse
     {
         $group=Group::find($groupId);
