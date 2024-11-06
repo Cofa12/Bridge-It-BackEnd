@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('table_members', function (Blueprint $table) {
+        Schema::create('group_user', function (Blueprint $table) {
             $table->foreignId('group_id')->references('id')->on('groups');
             $table->foreignId('user_id')->references('id')->on('users');
             $table->primary(['group_id','user_id']);
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('table_members');
+        Schema::dropIfExists('group_user');
     }
 };
