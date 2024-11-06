@@ -14,7 +14,9 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         //
         $middleware->alias([
-            'sanitizedCredentials'=>'App\Http\Middleware\SanitizedCredentials'
+            'sanitizedCredentials'=>'App\Http\Middleware\SanitizedCredentials',
+            'isAdmin'=>'App\Http\Middleware\IsAdmin',
+            'isFoundGroup'=>'App\Http\Middleware\IsFoundGroup',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
