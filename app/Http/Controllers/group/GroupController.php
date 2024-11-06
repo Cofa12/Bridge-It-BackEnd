@@ -5,6 +5,7 @@ namespace App\Http\Controllers\group;
 use App\Http\Controllers\Controller;
 use App\Models\Group;
 use App\Models\User;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -55,15 +56,17 @@ class GroupController extends Controller
             ],422);
         }
         if($request->hasFile('image')){
-            $image_path = time().'.'.$request->file('image')->extension();
-            $request->file('image')->move(storage_path('app/public/groups_image'), $image_path);
+            $imageName = time().'.'.$request->file('image')->extension();
+            Storage::putFileAs('groups_image', $request->file('image'),$imageName,'public' );
+            $imageUrl = Storage::url('groups_image/' . $imageName);
+
         }else{
-            $image_path = null;
+            $imageUrl = null;
         }
         $group=Group::create([
             'title'=>$request->input('title'),
             'doc_id'=>$request->input('doc_id'),
-            'image'=>$image_path,]
+            'image'=>$imageUrl,]
         );
 
         $user->groups()->attach($group->id);
@@ -148,9 +151,10 @@ class GroupController extends Controller
             ],422);
         }
         if($request->hasFile('image')){
-            $image_path = time().'.'.$request->file('image')->extension();
-            $request->file('image')->move(storage_path('app/public/groups_image'), $image_path);
-            $group->image=$image_path;
+            $imageName = time().'.'.$request->file('image')->extension();
+            Storage::putFileAs('groups_image', $request->file('image'),$imageName,'public' );
+            $imageUrl = Storage::url('groups_image/' . $imageName);
+            $group->image=$imageUrl;
         }
         $group->title=$request->input('title');
         $group->save();
