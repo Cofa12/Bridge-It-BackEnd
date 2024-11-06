@@ -42,6 +42,7 @@ Route::group(['middleware'=>'sanitizedCredentials'],function (){
 
     // group routes
 //    Route::apiResource('/group',GroupController::class);
+    // @todo: add the route to change the permissions
 
     Route::group(['middleware'=>'auth:sanctum'],function (){
        Route::get('/groups',[GroupController::class,'index']);
