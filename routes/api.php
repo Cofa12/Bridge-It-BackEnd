@@ -15,7 +15,7 @@ Route::get('/user', function (Request $request) {
 
 Route::group(['middleware'=>'sanitizedCredentials'],function (){
     Route::post('/register',[AuthController::class,'Register']);
-    Route::post('/login',[AuthController::class,'login']);
+    Route::post('/login',[AuthController::class,'login'])->name('login');
 });
 
 
@@ -41,4 +41,13 @@ Route::group(['middleware'=>'sanitizedCredentials'],function (){
 
 
     // group routes
-    Route::apiResource('/group',GroupController::class);
+//    Route::apiResource('/group',GroupController::class);
+
+    Route::group(['middleware'=>'auth:sanctum'],function (){
+       Route::get('/groups',[GroupController::class,'index']);
+        Route::post('/groups/store',[GroupController::class,'store']);
+        Route::delete('/groups/destroy',[GroupController::class,'destroy']);
+        Route::put('/groups/update',[GroupController::class,'update']);
+        Route::post('/groups/searchedGroups',[GroupController::class,'searchUsingName']);
+        Route::get('/groups/group{id}',[GroupController::class,'getGroupWithID']);
+    });
