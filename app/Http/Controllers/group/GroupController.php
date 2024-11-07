@@ -4,7 +4,10 @@ namespace App\Http\Controllers\group;
 
 use App\Http\Controllers\Controller;
 use App\Models\Group;
+use App\Models\Group_User;
 use App\Models\User;
+use App\Notifications\SendJoinGroupInvitation;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
@@ -194,4 +197,47 @@ class GroupController extends Controller
         $group=Group::find($groupId);
         return $group->users;
     }
+
+    public function sendJoinInvitation(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $invitationMails = $request->input('membersMails');
+        foreach ($invitationMails as $invitationMail){
+            Notification::route('mail',$invitationMail)->notify(new SendJoinGroupInvitation($request->SenderName,$request->groupName,$invitationMail,$request->groupId));
+        }
+
+        Notification::route('mail',$request->doctorMail)->notify(new SendJoinGroupInvitation($request->SenderName,$request->groupName,$request->doctorMail,$request->groupId,'doctor'));
+
+
+        return response()->json([
+            "message"=>"Invitations have been send successfully"
+        ],200);
+
+    }
+
+    public function acceptInvitation(Request $request): \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Foundation\Application
+    {
+        $receiverEmail =  $request->get('receiverEmail');
+        $groupId = $request->get('groupId');
+
+        $foundInDb = User::where('email',$receiverEmail)->pluck('id');
+        if(!isset($foundInDb[0])){
+            return view('error.message',['message'=> "You haven't register yet you must register first"]);
+        }
+        if($request->get('position')=='member'){
+
+            Group_User::create([
+                'group_id'=>$groupId,
+                'user_id'=>$foundInDb[0],
+                'position'=>'member'
+            ]);
+
+        }
+        Group::where('id',$groupId)->update([
+            'doc_id'=>$foundInDb[0]
+        ]);
+
+        return view('error.message',['message'=> "You have been added to the group successfully"]);
+
+    }
+
 }

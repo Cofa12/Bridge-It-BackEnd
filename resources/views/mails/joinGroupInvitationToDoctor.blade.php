@@ -3,8 +3,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <link rel="icon" href="{{asset('logo/logo.png')}}">
-    <title>Bridge It Account Verification</title>
+    <title>Seven Bridges Account Verification</title>
 </head>
 <body style="width:100%; height:100%; margin:0; padding:32px; font: normal normal normal 14px/21px Arial,sans-serif; color:#333; background-color:#f1f1f1; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%;">
 <table class="email-wrapper" style="width:100%; height:100%; margin:auto; padding:0; text-align:center; vertical-align:middle; border-spacing:0; border-collapse:collapse;"><tr><td>
@@ -16,12 +15,12 @@
 
                 <tbody class="email-body"><tr><td style="text-align:left;">
                         <div style="padding:21px 32px; background-color:#fff; border-bottom:2px solid #e1e1e1; border-radius:3px;">
-                            <h1 style="font-size:21px; line-height:30px; font-weight:bold;">Almost there! Just Use this code</h1>
+                            <h1 style="font-size:21px; line-height:30px; font-weight:bold;">Invitation Email</h1>
                             <p>
-                                *Note: this code is valid for 1 minute
+                                Hey,doctor! <span>{{$senderName}}</span> invites you to be the Supervisor of a group <span>{{$groupName}}</span>
                             </p>
                             <p style="padding:11px 0; text-align:left;">
-                                <span>{{$otp}}</span>
+                                <a href="{{route('acceptGroupInvitation',['receiverEmail'=>$receiverEmail,'groupId'=>$groupId,'position'=>$position])}}" id="postClick" style="padding:11px 21px; text-decoration:none; color:#fff !important; background-color:forestgreen; border:1px solid #358d49; border-radius:3px;">Accept</a>
                             </p>
                             <p>
                                 Cheers,<br>
@@ -42,25 +41,5 @@
 
         </td></tr></table>
 
-{{--<script>--}}
-{{--    document.getElementById("postClick").addEventListener("click", function(event) {--}}
-{{--        event.preventDefault();  // Prevent default link behavior--}}
-
-{{--        // Define the API endpoint--}}
-{{--        const apiUrl = 'http://127.0.0.1/api/Email/Confirm/';--}}
-
-{{--        const data = {--}}
-{{--            email:"{{$userEmail}}"--}}
-{{--        };--}}
-{{--        // Send a POST request using fetch--}}
-{{--        fetch(apiUrl, {--}}
-{{--            method: 'POST',--}}
-{{--            headers: {--}}
-{{--                'Content-Type': 'application/json',--}}
-{{--            },--}}
-{{--            body: JSON.stringify(data), // Convert data to JSON string--}}
-{{--        })--}}
-{{--    })--}}
-{{--</script>--}}
 </body>
 </html>

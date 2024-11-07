@@ -9,6 +9,9 @@ use Illuminate\Support\Facades\Schema;
 class Group extends Model
 {
     use HasFactory;
+    protected $fillable =[
+        'doc_id',
+    ];
     protected $guarded = [];
 
     public function users()
