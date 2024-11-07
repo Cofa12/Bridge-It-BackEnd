@@ -11,6 +11,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use function Laravel\Prompts\table;
 use function PHPUnit\Framework\isEmpty;
+use function PHPUnit\Framework\isNan;
+use function PHPUnit\Framework\isNull;
 
 class GroupController extends Controller
 {
@@ -24,7 +26,7 @@ class GroupController extends Controller
         $groups = $user->groups;
         $data=array();
         foreach ($groups as $group) {
-            $users=$group->users;
+            $group->users=$group->users;
             array_push($data,['group'=>$group]);
         }
 //        dd($data);
@@ -46,8 +48,6 @@ class GroupController extends Controller
         $validator=validator($request->all(), [
             'title' => 'required|string|max:255',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'doc_id' => 'required|exists:users,id'
-
         ]);
         if($validator->fails()){
             return response()->json([
@@ -66,7 +66,9 @@ class GroupController extends Controller
         $group=Group::create([
             'title'=>$request->input('title'),
             'doc_id'=>$request->input('doc_id'),
-            'image'=>$imageUrl,]
+            'image'=>$imageUrl,
+            'description'=>$request->input('description')
+            ]
         );
 
         $user->groups()->attach($group->id);
@@ -91,7 +93,7 @@ class GroupController extends Controller
             return response()->json([
                 'status'=>false,
                 'message'=>'group not found'
-            ]);
+            ],404);
         }
 //        dd($group);
         $members = $group->users;
@@ -109,7 +111,7 @@ class GroupController extends Controller
         $groupName=$request->input('name');
         $groups=Group::where('title','like','%'.$groupName.'%')->get();
         if ($groups->isEmpty()) {
-            return response()->json(['message' => 'No matching groups found']);
+            return response()->json(['message' => 'No matching groups found'],404);
         }
         return response()->json([
             'status'=>true,
@@ -176,16 +178,16 @@ class GroupController extends Controller
         ],200);
 
     }
-    public function getOut(Request $request): \Illuminate\Http\JsonResponse
-    {
-        $userId = Auth::id();
-        $groupId=$request->input('group_id');
-        $group=Group::findorfail($groupId);
-
-
-
-
-    }
+//    public function getOut(Request $request): \Illuminate\Http\JsonResponse
+//    {
+//        $userId = Auth::id();
+//        $groupId=$request->input('group_id');
+//        $group=Group::findorfail($groupId);
+//
+//
+//
+//
+//    }
 
     public function getGroupMembers(int $groupId): \Illuminate\Http\JsonResponse
     {
