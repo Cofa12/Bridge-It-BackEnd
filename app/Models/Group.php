@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Schema;
 
 class Group extends Model
@@ -22,6 +23,11 @@ class Group extends Model
     public static function hasAttributes(string $table, string $att): bool
     {
         return Schema::hasColumn($table,$att);
+    }
+
+    public function files():HasMany
+    {
+        return $this->hasMany(File::class);
     }
 
 
