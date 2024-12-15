@@ -84,7 +84,8 @@ class LandingPageController extends Controller
             'message'=>'Thank you for subscribing to our newsletter'
         ]);
     }
-
+    //@todo: change the content of mails sent to the subscribers
+/*
     public function sendSubscription()
     {
         $content='123456';
@@ -100,4 +101,5 @@ class LandingPageController extends Controller
 
 
     }
+*/
 }

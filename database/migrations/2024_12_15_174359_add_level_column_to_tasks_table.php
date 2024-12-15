@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
+        Schema::table('tasks', function (Blueprint $table) {
             //
-            $table->unsignedInteger('phone')->nullable();
+            $table->enum('level',['urgent','normal','later'])->after('status')->default('normal');
         });
     }
 
@@ -22,9 +22,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
+        Schema::table('tasks', function (Blueprint $table) {
             //
-            $table->dropColumn('phone');
+            $table->dropColumn('level');
         });
     }
 };

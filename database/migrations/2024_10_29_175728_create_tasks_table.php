@@ -24,7 +24,6 @@ return new class extends Migration
             $table->foreignId('challenge_id')->nullable()->references('id')->on('challenges');
             $table->foreignId('group_id')->references('id')->on('groups');
             $table->foreignId('task_steps')->references('id')->on('task_steps');
-
             $table->timestamps();
         });
     }
