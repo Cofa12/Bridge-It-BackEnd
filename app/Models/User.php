@@ -61,4 +61,8 @@ class User extends Authenticatable
     {
         return $this->morphMany(File::class,'filable');
     }
+    public function templates():HasMany
+    {
+        return $this->hasMany(Template::class);
+    }
 }

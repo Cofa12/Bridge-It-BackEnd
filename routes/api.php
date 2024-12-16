@@ -7,6 +7,7 @@ use App\Http\Controllers\auth\AuthController;
 use Laravel\Socialite\Facades\Socialite;
 use App\Http\Controllers\landing\LandingPageController;
 use App\Http\Controllers\group\GroupController;
+use function Laravel\Prompts\table;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -58,4 +59,15 @@ Route::group(['middleware'=>'sanitizedCredentials'],function (){
     });
 
 Route::get('confirm/Invitation',[GroupController::class,'acceptInvitation'])->name('acceptGroupInvitation');
+
+
+#todo :
+//1- stage (enum );
+//2- deadline;
+//3- templates table('name,image,voting,description,number_voting');
+//4- group-template relation
+//5- user-template relation
+//6- files table;
+//7- files-groups pivot
+
 
