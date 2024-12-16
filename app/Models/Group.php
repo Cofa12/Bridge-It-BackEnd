@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Facades\Schema;
 
 class Group extends Model
@@ -25,9 +26,9 @@ class Group extends Model
         return Schema::hasColumn($table,$att);
     }
 
-    public function files():HasMany
+    public function files():MorphMany
     {
-        return $this->hasMany(File::class);
+        return $this->morphMany(File::class,'filable');
     }
 
 

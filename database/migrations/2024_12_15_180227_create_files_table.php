@@ -14,9 +14,7 @@ return new class extends Migration
         Schema::create('files', function (Blueprint $table) {
             $table->id();
             $table->string('path');
-            $table->foreignId('group_id')->references('id')->on('groups');
-            $table->foreignId('task_id')->nullable()->references('id')->on('tasks');
-            $table->foreignId('publisher_id')->references('id')->on('users');
+            $table->morphs('filable');
             $table->timestamps();
         });
     }

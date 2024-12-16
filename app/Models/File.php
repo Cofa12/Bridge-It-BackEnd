@@ -16,20 +16,14 @@ class File extends Model
         'publisher_id'
     ];
 
-    public function group():BelongsTo
+    public function filable():BelongsTo
     {
-        return $this->belongsTo(Group::class);
+        return $this->morphTo();
     }
 
-    public function user():BelongsTo
-    {
-        return $this->belongsTo(User::class);
-    }
 
-    public function task():BelongsTo
-    {
-        return $this->belongsTo(Task::class);
-    }
+
+
 
 
 }
