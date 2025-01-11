@@ -17,6 +17,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'sanitizedCredentials'=>'App\Http\Middleware\SanitizedCredentials',
             'isAdmin'=>'App\Http\Middleware\isAdmin',
             'isFoundGroup'=>'App\Http\Middleware\isFoundGroup',
+            'checkAuth'=>'App\Http\Middleware\CheckAuth',
+
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

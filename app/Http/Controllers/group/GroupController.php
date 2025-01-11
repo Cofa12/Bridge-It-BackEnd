@@ -7,6 +7,7 @@ use App\Models\Group;
 use App\Models\Group_User;
 use App\Models\User;
 use App\Notifications\SendJoinGroupInvitation;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
@@ -214,29 +215,33 @@ class GroupController extends Controller
 
     }
 
-    public function acceptInvitation(Request $request): \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Foundation\Application
+    public function acceptInvitation(Request $request): JsonResponse
     {
         $receiverEmail =  $request->get('receiverEmail');
         $groupId = $request->get('groupId');
 
-        $foundInDb = User::where('email',$receiverEmail)->pluck('id');
-        if(!isset($foundInDb[0])){
-            return view('error.message',['message'=> "You haven't register yet you must register first"]);
-        }
-        if($request->get('position')=='member'){
+        $userId = User::where('email',$receiverEmail)->pluck('id');
 
+        if($request->get('position')=='member'){
+            $UserFoundInDb = Group_User::where('group_id',$groupId)->where('user_id',$userId[0])->get();
+            if($UserFoundInDb){
+                return response()->json([
+                    'message'=>"You have already in this group"
+                ],200);
+            }
             Group_User::create([
                 'group_id'=>$groupId,
-                'user_id'=>$foundInDb[0],
+                'user_id'=>$userId[0],
                 'position'=>'member'
             ]);
 
         }
         Group::where('id',$groupId)->update([
-            'doc_id'=>$foundInDb[0]
+            'doc_id'=>$userId[0]
         ]);
-
-        return view('error.message',['message'=> "You have been added to the group successfully"]);
+        return response()->json([
+            'message'=>'You have been added to the group successfully'
+        ],200);
 
     }
 

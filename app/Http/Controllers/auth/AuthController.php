@@ -80,8 +80,6 @@ class AuthController extends Controller
 
 
     public function providerRegister($provider){
-//        $url = Socialite::driver('google')->stateless()->redirect()->getTargetUrl();
-//        return response()->json(['url' => $url]);
         if($provider=='twitter'){
             return Socialite::driver($provider)->redirect();
        }else{
@@ -89,51 +87,51 @@ class AuthController extends Controller
         }
     }
     public function providerRegisterRedirection($provider){
-        try {
-            if($provider=='twitter'){
-                $user = Socialite::driver($provider)->user();
-            }else{
-                $user = Socialite::driver($provider)->stateless()->user();
-            }
-
-        } catch (ClientException $exception) {
-            return response()->json(['status'=>false,'error' => 'Invalid credentials provided.'], 422);
-        }
-
-        try {
-            User::firstOrCreate([
-                'user_id' => "$user->id",
-                'name' => $user->name,
-                'email' => $user->email,
-                'avatar' => $user->avatar,
-                'email_verified_at' => now()
-            ]);
-        }catch (UniqueConstraintViolationException $e){
-
-        } finally {
-            $storedUserInDB = User::where('email',$user->email)->first();
-            if(isset($storedUserInDB->password)&&$storedUserInDB->password){
-                Cache::store('database')->put('message',"need to enter password",600);
-                return response()->json([
-                    'message'=>[
-                        'error'=>'Need To Enter Password'
-                    ]
-                ],406);
-            }
-            $token = $storedUserInDB->createToken('user_token')->plainTextToken;
-            Cache::store('database')->put('user',$storedUserInDB,600);
-            Cache::store('database')->put('token',$token,600);
-            return response()->json([
-                "data"=>[
-                    "user"=> $storedUserInDB
-                ],
-                "token"=>[
-                    "access_token"=>$token,
-                    "type"=>"Bearer",
-                    "expires_in"=>"infinity"
-                ]
-            ],201);
-        }
+//        try {
+//            if($provider=='twitter'){
+//                $user = Socialite::driver($provider)->user();
+//            }else{
+//                $user = Socialite::driver($provider)->stateless()->user();
+//            }
+//
+//        } catch (ClientException $exception) {
+//            return response()->json(['status'=>false,'error' => 'Invalid credentials provided.'], 422);
+//        }
+//
+//        try {
+//            User::firstOrCreate([
+//                'user_id' => "$user->id",
+//                'name' => $user->name,
+//                'email' => $user->email,
+//                'avatar' => $user->avatar,
+//                'email_verified_at' => now()
+//            ]);
+//        }catch (UniqueConstraintViolationException $e){
+//
+//        } finally {
+//            $storedUserInDB = User::where('email',$user->email)->first();
+//            if(isset($storedUserInDB->password)&&$storedUserInDB->password){
+//                Cache::store('database')->put('message',"need to enter password",600);
+//                return response()->json([
+//                    'message'=>[
+//                        'error'=>'Need To Enter Password'
+//                    ]
+//                ],406);
+//            }
+//            $token = $storedUserInDB->createToken('user_token')->plainTextToken;
+//            Cache::store('database')->put('user',$storedUserInDB,600);
+//            Cache::store('database')->put('token',$token,600);
+//            return response()->json([
+//                "data"=>[
+//                    "user"=> $storedUserInDB
+//                ],
+//                "token"=>[
+//                    "access_token"=>$token,
+//                    "type"=>"Bearer",
+//                    "expires_in"=>"infinity"
+//                ]
+//            ],201);
+//        }
     }
 
     public function getCredentialsUser(){

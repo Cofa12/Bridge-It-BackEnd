@@ -57,5 +57,5 @@ Route::group(['middleware'=>'sanitizedCredentials'],function (){
         });
     });
 
-Route::get('confirm/Invitation',[GroupController::class,'acceptInvitation'])->name('acceptGroupInvitation');
+Route::get('confirm/Invitation',[GroupController::class,'acceptInvitation'])->name('acceptGroupInvitation')->middleware('checkAuth');
 
