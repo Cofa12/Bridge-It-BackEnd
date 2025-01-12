@@ -56,18 +56,12 @@ Route::group(['middleware'=>'sanitizedCredentials'],function (){
             Route::put('/groups/update',[GroupController::class,'update']);
             Route::post('/invite/members',[GroupController::class,'sendJoinInvitation']);
         });
+        Route::get('confirm/Invitation',[GroupController::class,'acceptInvitation'])->name('acceptGroupInvitation');
+        Route::post('/groups/join/fromLink',[GroupController::class,'joinFromLink'])->name('');
     });
+    Route::get('confirm/Invitation/link/{groupId}/{adminId}',[GroupController::class,'joinView'])->name('joinViewLink');
 
-Route::get('confirm/Invitation',[GroupController::class,'acceptInvitation'])->name('acceptGroupInvitation')->middleware('checkAuth');
 
 
-#todo :
-//1- stage (enum );
-//2- deadline;
-//3- templates table('name,image,voting,description,number_voting');
-//4- group-template relation
-//5- user-template relation
-//6- files table;
-//7- files-groups pivot
 
 
