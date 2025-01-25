@@ -7,6 +7,7 @@ use App\Models\Group;
 use App\Models\Group_User;
 use App\Models\User;
 use App\Notifications\SendJoinGroupInvitation;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
@@ -52,6 +53,8 @@ class GroupController extends Controller
         $validator=validator($request->all(), [
             'title' => 'required|string|max:255',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'description'=>'string',
+            'deadline'=>'date'
         ]);
         if($validator->fails()){
             return response()->json([
@@ -71,16 +74,23 @@ class GroupController extends Controller
             'title'=>$request->input('title'),
             'doc_id'=>$request->input('doc_id'),
             'image'=>$imageUrl,
-            'description'=>$request->input('description')
+            'description'=>$request->input('description'),
+            'stage'=>$request->stage,
+            'deadline'=>Carbon::parse($request->deadline)->format("Y-m-d")
             ]
         );
+        $group->users()->attach([$group->id =>[
+            'user_id'=>Auth()->id(),
+            'position'=>'admin'
+        ]]);
+        $users = $group->users;
 
-        $user->groups()->attach($group->id);
+//        $user->groups()->attach($group->id);
 
         return response()->json([
             'status'=>true,
             'group'=>$group,
-
+            'users'=>$users
         ],201);
 
     }

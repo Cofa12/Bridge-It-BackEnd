@@ -14,6 +14,12 @@ class Group extends Model
     use HasFactory;
     protected $fillable =[
         'doc_id',
+        'title',
+        'description',
+        'image',
+        'deadline',
+        'stage',
+        'category_id'
     ];
     protected $guarded = [];
 
