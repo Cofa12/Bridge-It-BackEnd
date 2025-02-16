@@ -7,17 +7,13 @@ use App\Models\Group;
 use App\Models\Group_User;
 use App\Models\User;
 use App\Notifications\SendJoinGroupInvitation;
-use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-use function Laravel\Prompts\table;
-use function PHPUnit\Framework\isEmpty;
-use function PHPUnit\Framework\isNan;
-use function PHPUnit\Framework\isNull;
+use App\Notifications\SendCheckJoinUser;
 
 class GroupController extends Controller
 {
@@ -53,8 +49,9 @@ class GroupController extends Controller
         $validator=validator($request->all(), [
             'title' => 'required|string|max:255',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'description'=>'string',
-            'deadline'=>'date'
+            'description' => 'required|string|max:255',
+            'deadline' => 'required|date',
+            'stage' => 'required|in:planning,research,development,review,finalization',
         ]);
         if($validator->fails()){
             return response()->json([
@@ -70,27 +67,34 @@ class GroupController extends Controller
         }else{
             $imageUrl = null;
         }
-        $group=Group::create([
-            'title'=>$request->input('title'),
-            'doc_id'=>$request->input('doc_id'),
-            'image'=>$imageUrl,
-            'description'=>$request->input('description'),
-            'stage'=>$request->stage,
-            'deadline'=>Carbon::parse($request->deadline)->format("Y-m-d")
-            ]
-        );
-        $group->users()->attach([$group->id =>[
-            'user_id'=>Auth()->id(),
-            'position'=>'admin'
-        ]]);
-        $users = $group->users;
+        //        dd($request->input('title'));
+        //['planning','research','development','review','finalization']
+        $group=new Group();
+        $group->title=$request->input('title');
+        $group->image=$imageUrl;
+        $group->description=$request->input('description');
+        $group->deadline=$request->input('deadline');
+        $group->stage=$request->input('stage');
+        $group->save();
 
-//        $user->groups()->attach($group->id);
+
+//        $group=Group::create([
+//            'title'=>,
+//            'image'=>$imageUrl,
+//            'description'=>$request->input('description'),
+//            'deadline'=>$request->input('deadline'),
+//            'stage'=>$request->input('stage'),
+//            ]
+//        );
+
+        $link=$this->linkCreation($group->id, $user->getAuthIdentifier());
+
+        $user->groups()->attach($group->id);
 
         return response()->json([
             'status'=>true,
             'group'=>$group,
-            'users'=>$users
+            'link'=>$link,
         ],201);
 
     }
@@ -163,6 +167,7 @@ class GroupController extends Controller
         }
         $group->title=$request->input('title');
         $group->save();
+//        dd($group);
 
         return response()->json([
             'status'=>true,
@@ -255,4 +260,45 @@ class GroupController extends Controller
 
     }
 
+    function linkCreation($GroupId,$AdminId): string
+    {
+        return "https://bridgeit.site/api/confirm/Invitation/link/$GroupId/$AdminId";
+    }
+    function joinView($adminId,$groupId): JsonResponse
+    {
+        $group=Group::findorFail($groupId);
+        $admin=User::FindOrFail($adminId);
+        return response()->json([
+            'status'=>true,
+            'group'=>$group,
+            'invited from'=>$admin->name,
+            'adminId'=>$adminId,
+        ]);
+
+    }
+
+    function joinFromLink(Request $request): string
+    {
+
+        $groupId=$request->input('groupId');
+        $groupName=Group::findOrFail($groupId)->title;
+
+        $adminId=$request->input('adminId');
+        $adminEmail=User::findOrFail($adminId)->email;
+        $adminName=User::findOrFail($adminId)->name;
+
+        $userId=$request->input('userId');
+        $userName=User::findOrFail($userId)->name;
+        $userEmail=User::findOrFail($userId)->email;
+
+        Notification::route('mail',$adminEmail)->notify(
+            new SendCheckJoinUser($userName,$userEmail,$groupName,$adminName,$groupId,'member')
+        );
+
+        return response()->json([
+            'status'=>true,
+            'message'=>'wait the confirmation from Admin'
+        ],200);
+
+    }
 }
