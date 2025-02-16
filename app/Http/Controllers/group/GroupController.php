@@ -6,18 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Models\Group;
 use App\Models\Group_User;
 use App\Models\User;
-use App\Notifications\SendCheckJoinUser;
 use App\Notifications\SendJoinGroupInvitation;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-use function Laravel\Prompts\table;
-use function PHPUnit\Framework\isEmpty;
-use function PHPUnit\Framework\isNan;
-use function PHPUnit\Framework\isNull;
+use App\Notifications\SendCheckJoinUser;
 
 class GroupController extends Controller
 {
@@ -48,7 +44,7 @@ class GroupController extends Controller
      */
     public function store(Request $request): \Illuminate\Http\JsonResponse
     {
-        // // stage , deadline , invitation_link
+        //
         $user = Auth::user();
         $validator=validator($request->all(), [
             'title' => 'required|string|max:255',
@@ -71,7 +67,7 @@ class GroupController extends Controller
         }else{
             $imageUrl = null;
         }
-//        dd($request->input('title'));
+        //        dd($request->input('title'));
         //['planning','research','development','review','finalization']
         $group=new Group();
         $group->title=$request->input('title');
@@ -171,6 +167,7 @@ class GroupController extends Controller
         }
         $group->title=$request->input('title');
         $group->save();
+//        dd($group);
 
         return response()->json([
             'status'=>true,
@@ -269,7 +266,7 @@ class GroupController extends Controller
     }
     function joinView($adminId,$groupId): JsonResponse
     {
-       $group=Group::findorFail($groupId);
+        $group=Group::findorFail($groupId);
         $admin=User::FindOrFail($adminId);
         return response()->json([
             'status'=>true,
@@ -304,6 +301,4 @@ class GroupController extends Controller
         ],200);
 
     }
-
-
 }

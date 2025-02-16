@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::table('groups', function (Blueprint $table) {
             //
             $table->enum('stage',['planning','research','development','review','finalization'])->after('image');
-            $table->timestamp('deadline')->nullable();
+            $table->date('deadline')->nullable();
         });
     }
 
