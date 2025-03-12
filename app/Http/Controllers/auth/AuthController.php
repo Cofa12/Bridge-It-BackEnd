@@ -32,7 +32,8 @@ class AuthController extends Controller
             'email' => 'required|email',
             'password'=>'required|string',
             'type' => 'string',
-            'phone' => 'string'
+            'phone' => 'string',
+            'device_token'=>'required|string'
         ]);
 
         if($validator->fails()){
@@ -49,6 +50,11 @@ class AuthController extends Controller
                 'type'=> $request->type != '' ? $request->type : 'regular',
                 'phone'=> $request->phone != '' ? $request->phone : null,
             ]);
+
+            $user->tokens()->create([
+                'token'=>$request->device_token
+            ]);
+
             Notification::route('mail',$request->email)->notify(new SendVerificationEmail($request->email));
         }catch (UniqueConstraintViolationException $e){
             return response()->json([
@@ -60,6 +66,7 @@ class AuthController extends Controller
         if($user){
             return response()->json([
                 'status'=>true,
+                'user'=>$user,
                 'message'=>'Successfully Signed Up'
             ],201);
         }
@@ -155,7 +162,9 @@ class AuthController extends Controller
     public function login(Request $request){
         $validator = validator::make($request->all(),[
             'email'=>'required|email',
-            'password'=>'required|string'
+            'password'=>'required|string',
+            'device_token'=>'required|string'
+
         ]);
 
 
@@ -170,6 +179,8 @@ class AuthController extends Controller
         // see this bug
         $user = Auth::attempt($request->only(['email','password']));
 
+
+
         if(!$user){
             return response()->json([
                 'status' => false,
@@ -178,6 +189,9 @@ class AuthController extends Controller
         }
 
         $user = User::where('email',$request->email)->whereNotNull('email_verified_at')->first();
+        $user->tokens()->create([
+            'token'=>$request->device_token
+        ]);
         if(!$user){
             return response()->json([
                 'status'=>true,

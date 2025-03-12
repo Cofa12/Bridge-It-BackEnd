@@ -65,4 +65,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Template::class);
     }
+
+    public function tokens():HasMany
+    {
+        return $this->hasMany(Token::class);
+    }
 }
