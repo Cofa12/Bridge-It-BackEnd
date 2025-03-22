@@ -14,8 +14,6 @@ use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Illuminate\Contracts\View\Factory as ViewFactory;
 use Illuminate\Foundation\Bus\PendingClosureDispatch;
 use Illuminate\Foundation\Bus\PendingDispatch;
-use Illuminate\Foundation\Defer\DeferredCallback;
-use Illuminate\Foundation\Defer\DeferredCallbackCollection;
 use Illuminate\Foundation\Mix;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Log\Context\Repository as ContextRepository;
@@ -111,7 +109,7 @@ if (! function_exists('app')) {
     /**
      * Get the available container instance.
      *
-     * @template TClass
+     * @template TClass of object
      *
      * @param  string|class-string<TClass>|null  $abstract
      * @param  array  $parameters
@@ -408,18 +406,11 @@ if (! function_exists('defer')) {
      * @param  callable|null  $callback
      * @param  string|null  $name
      * @param  bool  $always
-     * @return \Illuminate\Foundation\Defer\DeferredCallback
+     * @return \Illuminate\Support\Defer\DeferredCallback
      */
     function defer(?callable $callback = null, ?string $name = null, bool $always = false)
     {
-        if ($callback === null) {
-            return app(DeferredCallbackCollection::class);
-        }
-
-        return tap(
-            new DeferredCallback($callback, $name, $always),
-            fn ($deferred) => app(DeferredCallbackCollection::class)[] = $deferred
-        );
+        return \Illuminate\Support\defer($callback, $name, $always);
     }
 }
 
@@ -613,8 +604,8 @@ if (! function_exists('old')) {
      * Retrieve an old input item.
      *
      * @param  string|null  $key
-     * @param  mixed  $default
-     * @return mixed
+     * @param  \Illuminate\Database\Eloquent\Model|string|array|null  $default
+     * @return string|array|null
      */
     function old($key = null, $default = null)
     {
@@ -802,7 +793,7 @@ if (! function_exists('resolve')) {
     /**
      * Resolve a service from the container.
      *
-     * @template TClass
+     * @template TClass of object
      *
      * @param  string|class-string<TClass>  $name
      * @param  array  $parameters

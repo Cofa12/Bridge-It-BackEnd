@@ -8,7 +8,6 @@ use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 use Illuminate\Contracts\Support\Arrayable;
 
-
 class EloquentUserProvider implements UserProvider
 {
     /**
@@ -56,8 +55,8 @@ class EloquentUserProvider implements UserProvider
         $model = $this->createModel();
 
         return $this->newModelQuery($model)
-                    ->where($model->getAuthIdentifierName(), $identifier)
-                    ->first();
+            ->where($model->getAuthIdentifierName(), $identifier)
+            ->first();
     }
 
     /**
@@ -152,10 +151,12 @@ class EloquentUserProvider implements UserProvider
         if (is_null($plain = $credentials['password'])) {
             return false;
         }
-//        dd($user->getAuthPassword()); // $2y$12$NGvL8/AJxJuBTpr/GYL8J.KFNRJR9MqpGwupOxb7DjSXlu5.ImbmO
-//        dd($this->hasher->make($plain));// $2y$12$7b4h/dA6v8FaxL3E03Oy1.qGzDzokXKtmPefYRlnvYTk7YbsJgyNu
-//        dd($plain);
-        return $this->hasher->check($plain, $user->getAuthPassword());
+
+        if (is_null($hashed = $user->getAuthPassword())) {
+            return false;
+        }
+
+        return $this->hasher->check($plain, $hashed);
     }
 
     /**

@@ -19,7 +19,7 @@ abstract class AbstractHasher
      * Check the given plain value against a hash.
      *
      * @param  string  $value
-     * @param  string|null  $hashedValue
+     * @param  string  $hashedValue
      * @param  array  $options
      * @return bool
      */
@@ -29,7 +29,6 @@ abstract class AbstractHasher
             return false;
         }
 
-//        dd(password_verify($value, $hashedValue));
         return password_verify($value, $hashedValue);
     }
 }
