@@ -45,7 +45,7 @@ class AuthController extends Controller
 
             return response()->json([
                 'status' => true,
-                'message' => 'check your email for verification',
+                'message' => 'Registered Successfully',
             ], 201);
 
         }catch (\Exception $e){
@@ -146,7 +146,6 @@ class AuthController extends Controller
     public function login(LoginRequest $request): JsonResponse
     {
         $credentials = $request->only('email', 'password');
-
         if (!Auth::attempt($credentials)) {
             return response()->json([
                 'status' => false,
@@ -154,7 +153,7 @@ class AuthController extends Controller
             ], 401);
         }
 
-        $user = User::findOrFail(Auth::id());
+        $user = auth()->user();
         if (is_null($user->email_verified_at)) {
             return response()->json([
                 'status' => false,

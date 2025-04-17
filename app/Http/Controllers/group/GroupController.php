@@ -149,9 +149,9 @@ class GroupController extends Controller
 
 
         $validator=validator($request->all(),[
-            'title' => 'required|string|max:255',
+            'title' => 'sometimes|string|max:255',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'doc_id' => 'required|exists:users,id'
+            'doc_id' => 'sometimes|exists:users,id'
         ]);
         if($validator->fails()){
             return response()->json([
