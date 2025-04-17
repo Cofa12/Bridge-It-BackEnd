@@ -1,23 +1,19 @@
 <?php
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\auth\AuthController;
-use Laravel\Socialite\Facades\Socialite;
 use App\Http\Controllers\landing\LandingPageController;
 use App\Http\Controllers\group\GroupController;
-use function Laravel\Prompts\table;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
 
-Route::group(['middleware'=>'sanitizedCredentials'],function (){
+
     Route::post('/register',[AuthController::class,'Register']);
-    Route::post('/login',[AuthController::class,'login'])->name('login');
-});
+    Route::post('/login',[AuthController::class,'login']);
 
 
     Route::get('/register/{provider}',[AuthController::class,'providerRegister']);

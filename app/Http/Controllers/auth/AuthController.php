@@ -145,6 +145,7 @@ class AuthController extends Controller
         ],201);    }
     public function login(LoginRequest $request): JsonResponse
     {
+        dd("here");
         $credentials = $request->only('email', 'password');
         if (!Auth::attempt($credentials)) {
             return response()->json([
