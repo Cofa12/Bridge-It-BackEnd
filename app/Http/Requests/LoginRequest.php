@@ -24,6 +24,7 @@ class LoginRequest extends FormRequest
         return [
             'email'=>'required|email|exists:users,email',
             'password'=>'required|string',
+            'device_token'=>'required|string'
         ];
     }
 }
