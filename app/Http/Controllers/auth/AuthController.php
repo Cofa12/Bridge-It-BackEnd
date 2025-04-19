@@ -9,9 +9,9 @@ use App\Http\Requests\RegisterRequest;
 use App\Models\User;
 use App\Notifications\SendOTPcode;
 use App\Notifications\SendVerificationEmail;
-use App\SaveSocialiteData;
+//use App\SaveSocialiteData;
 use GuzzleHttp\Exception\ClientException;
-use http\Env\Response;
+//use http\Env\Response;
 use Illuminate\Auth\SessionGuard;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\Request;
@@ -41,11 +41,25 @@ class AuthController extends Controller
             $user = User::create($data);
 //            Notification::route('mail',$request->email)
 //                ->notify(new SendVerificationEmail($request->email));
+            $deviceToken = $request->input('device_token');
+            $user->UserTokens()->create([
+                'token'=>$deviceToken,
+                'user_id'=>$user->id,
+            ]);
+
+            $token = $user->createToken('User_token')->plainTextToken;
+
             DB::commit();
 
             return response()->json([
+                'user'=> $user,
                 'status' => true,
                 'message' => 'Registered Successfully',
+                "token"=>[
+                    "access_token"=>$token,
+                    "type"=>"Bearer",
+                    "expires_in"=>"infinity"
+                ],
             ], 201);
 
         }catch (\Exception $e){
@@ -60,7 +74,7 @@ class AuthController extends Controller
 
     public function confirmEmail(ConfirmEmailRequest $request)
     {
-        $user = User::where('email',$request->get('email'))->update([
+        $user = User::where('email', $request->get('email'))->update([
             'email_verified_at'=> now()
         ]);
 
@@ -145,16 +159,18 @@ class AuthController extends Controller
         ],201);    }
     public function login(LoginRequest $request): JsonResponse
     {
-        dd("here");
         $credentials = $request->only('email', 'password');
-        if (!Auth::attempt($credentials)) {
+        $user = User::where('email',$request->email)->first();
+
+        if (!$user || !Hash::check($request->password, $user->password)) {
             return response()->json([
                 'status' => false,
-                'message' => 'Email or password is not correct'
+                'message' => 'Invalid credentials'
             ], 401);
         }
 
-        $user = auth()->user();
+        $token = $user->createToken('User_token')->plainTextToken;
+
         if (is_null($user->email_verified_at)) {
             return response()->json([
                 'status' => false,
@@ -162,7 +178,12 @@ class AuthController extends Controller
             ], 422);
         }
 
-        $token = $user->createToken('User_token')->plainTextToken;
+        $deviceToken=$request->input('device_token');
+        $user->UserTokens()->create([
+            'token'=>$deviceToken,
+            'user_id'=>$user->id,
+        ]);
+
         return response()->json([
             "data"=>[
                 "user"=> $user

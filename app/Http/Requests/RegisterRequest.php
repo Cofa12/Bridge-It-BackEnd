@@ -25,6 +25,7 @@ class RegisterRequest extends FormRequest
             //
             'name'=>'required|string|max:40',
             'email' => 'required|email|unique:users,email',
+            'device_token'=>'required|string',
             'password'=>'required|string',
             'type' => 'string',
             'phone' => 'string'
@@ -39,6 +40,8 @@ class RegisterRequest extends FormRequest
             'email.required'=>'Email is required',
             'email.email'=>'Email is invalid',
             'email.unique'=>'Email already exists',
+            'device_token.required'=>'Device token is required',
+            'device_token.string'=>'Device token must be string',
             'password.required'=>'Password is required'
         ];
     }
