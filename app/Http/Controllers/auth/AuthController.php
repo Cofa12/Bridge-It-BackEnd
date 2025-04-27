@@ -3,29 +3,24 @@
 namespace App\Http\Controllers\auth;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\ConfirmEmailRequest;
-use App\Http\Requests\LoginRequest;
-use App\Http\Requests\RegisterRequest;
+use App\Http\Requests\AuthRequests\ConfirmEmailRequest;
+use App\Http\Requests\AuthRequests\LoginRequest;
+use App\Http\Requests\AuthRequests\RegisterRequest;
 use App\Models\User;
 use App\Notifications\SendOTPcode;
-use App\Notifications\SendVerificationEmail;
-//use App\SaveSocialiteData;
-use GuzzleHttp\Exception\ClientException;
-//use http\Env\Response;
-use Illuminate\Auth\SessionGuard;
-use Illuminate\Database\UniqueConstraintViolationException;
+use Ichtrojan\Otp\Otp;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-//use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Socialite\Facades\Socialite;
-use Ichtrojan\Otp\Otp;
-use \Illuminate\Http\JsonResponse;
+
+//use App\SaveSocialiteData;
+//use http\Env\Response;
+//use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {

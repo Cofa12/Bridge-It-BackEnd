@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\AuthRequests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class LoginRequest extends FormRequest
+class ConfirmEmailRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -21,10 +21,18 @@ class LoginRequest extends FormRequest
      */
     public function rules(): array
     {
+//        dd($this->input('email'));
         return [
-            'email'=>'required|email|exists:users,email',
-            'password'=>'required|string',
-            'device_token'=>'required|string'
+            'email' => 'required|email|exists:users,email',
+            //
+        ];
+    }
+    public function messages(): array
+    {
+        return [
+            'email.required' => 'Email is required',
+            'email.email' => 'Invalid email format',
+            'email.exists' => 'not found user',
         ];
     }
 }
