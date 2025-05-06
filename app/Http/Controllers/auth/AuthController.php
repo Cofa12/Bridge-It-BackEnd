@@ -3,82 +3,75 @@
 namespace App\Http\Controllers\auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\AuthRequests\ConfirmEmailRequest;
+use App\Http\Requests\AuthRequests\LoginRequest;
+use App\Http\Requests\AuthRequests\RegisterRequest;
 use App\Models\User;
 use App\Notifications\SendOTPcode;
-use App\Notifications\SendVerificationEmail;
-use App\SaveSocialiteData;
-use GuzzleHttp\Exception\ClientException;
-use http\Env\Response;
-use Illuminate\Auth\SessionGuard;
-use Illuminate\Database\UniqueConstraintViolationException;
+use Ichtrojan\Otp\Otp;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-//use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Socialite\Facades\Socialite;
-use Ichtrojan\Otp\Otp;
+
+//use App\SaveSocialiteData;
+//use http\Env\Response;
+//use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
     //
 //    use SaveSocialiteData;
-    public function Register(Request $request){
-        $validator = validator::make($request->all(),[
-            'name'=>'required|string|max:40',
-            'email' => 'required|email',
-            'password'=>'required|string',
-            'type' => 'string',
-            'phone' => 'string',
-            'device_token'=>'required|string'
-        ]);
-
-        if($validator->fails()){
-            return response()->json([
-                'status'=>false,
-                'message'=>$validator->errors(),
-            ],422);
-        }
+    public function Register(RegisterRequest $request): JsonResponse
+    {
+        $data=$request->validated();
+        $data['type'] = $request->type != '' ? $request->type : 'regular';
+        $data['phone'] =  $request->phone != '' ? $request->phone : null;
         try {
-            $user = User::create([
-                'name'=>$request->name,
-                'email'=>$request->email,
-                'password'=>$request['password'],
-                'type'=> $request->type != '' ? $request->type : 'regular',
-                'phone'=> $request->phone != '' ? $request->phone : null,
+            DB::beginTransaction();
+            $user = User::create($data);
+//            Notification::route('mail',$request->email)
+//                ->notify(new SendVerificationEmail($request->email));
+            $deviceToken = $request->input('device_token');
+            $user->UserTokens()->create([
+                'token'=>$deviceToken,
+                'user_id'=>$user->id,
             ]);
 
-            $user->tokens()->create([
-                'token'=>$request->device_token
-            ]);
+            $token = $user->createToken('User_token')->plainTextToken;
 
-            Notification::route('mail',$request->email)->notify(new SendVerificationEmail($request->email));
-        }catch (UniqueConstraintViolationException $e){
+            DB::commit();
+
+            return response()->json([
+                'user'=> $user,
+                'status' => true,
+                'message' => 'Registered Successfully',
+                "token"=>[
+                    "access_token"=>$token,
+                    "type"=>"Bearer",
+                    "expires_in"=>"infinity"
+                ],
+            ], 201);
+
+        }catch (\Exception $e){
+            DB::rollBack();
+
             return response()->json([
                 'status'=>false,
-                'message'=>'This email is already exist'
+                'message'=>$e->getMessage()
             ],422);
-        }
-
-        if($user){
-            return response()->json([
-                'status'=>true,
-                'user'=>$user,
-                'message'=>'Successfully Signed Up'
-            ],201);
         }
     }
 
-    public function confirmEmail(Request $request){
-
-        $user = User::where('email',$request->get('email'))->update([
+    public function confirmEmail(ConfirmEmailRequest $request)
+    {
+        $user = User::where('email', $request->get('email'))->update([
             'email_verified_at'=> now()
         ]);
-
-//        echo $request->get('email');
 
         if($user){
             return view('mails.verified');
@@ -159,46 +152,33 @@ class AuthController extends Controller
                 "expires_in"=>"infinity"
             ]
         ],201);    }
-    public function login(Request $request){
-        $validator = validator::make($request->all(),[
-            'email'=>'required|email',
-            'password'=>'required|string',
-            'device_token'=>'required|string'
+    public function login(LoginRequest $request): JsonResponse
+    {
+        $credentials = $request->only('email', 'password');
+        $user = User::where('email',$request->email)->first();
 
-        ]);
-
-
-        if($validator->fails()){
-            return response()->json([
-                'status'=>false,
-                'message'=>$validator->errors(),
-            ],422);
-        }
-
-
-        // see this bug
-        $user = Auth::attempt($request->only(['email','password']));
-
-
-
-        if(!$user){
+        if (!$user || !Hash::check($request->password, $user->password)) {
             return response()->json([
                 'status' => false,
-                'message' => 'Email or password is not correct'
+                'message' => 'Invalid credentials'
             ], 401);
         }
 
-        $user = User::where('email',$request->email)->whereNotNull('email_verified_at')->first();
-        $user->tokens()->create([
-            'token'=>$request->device_token
-        ]);
-        if(!$user){
-            return response()->json([
-                'status'=>true,
-                'message'=>'Email has not been verified yet!'
-            ],422);
-        }
         $token = $user->createToken('User_token')->plainTextToken;
+
+        if (is_null($user->email_verified_at)) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Email has not been verified yet!'
+            ], 422);
+        }
+
+        $deviceToken=$request->input('device_token');
+        $user->UserTokens()->create([
+            'token'=>$deviceToken,
+            'user_id'=>$user->id,
+        ]);
+
         return response()->json([
             "data"=>[
                 "user"=> $user

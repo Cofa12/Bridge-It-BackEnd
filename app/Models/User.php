@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -66,8 +67,8 @@ class User extends Authenticatable
         return $this->hasMany(Template::class);
     }
 
-    public function tokens():HasMany
+    public function UserTokens():HasMany
     {
-        return $this->hasMany(Token::class);
+        return $this->hasMany(UserToken::class);
     }
 }
