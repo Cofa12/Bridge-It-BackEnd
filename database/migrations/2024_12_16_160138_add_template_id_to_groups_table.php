@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('groups', function (Blueprint $table) {
             //
-            $table->foreignId('template_id')->references('id')->on('templates')->cascadeOnDelete();
+            $table->foreignId('template_id')->nullable()->references('id')->on('templates')->cascadeOnDelete();
         });
     }
 
