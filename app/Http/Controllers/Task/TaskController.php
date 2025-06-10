@@ -7,9 +7,11 @@ use App\Http\Requests\TaskRequest\DeleteRequest;
 use App\Http\Requests\TaskRequest\StoreRequest;
 use App\Http\Requests\TaskRequest\UpdateRequest;
 use App\Models\Task;
-use App\Models\Group;
+use App\Notifications\Tasks\Taskdeleted;
+use App\Notifications\Tasks\TaskUpdated;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use App\Notifications\Tasks\TaskAssigned;
 
 class TaskController extends Controller
 {
@@ -38,6 +40,10 @@ class TaskController extends Controller
         $task = $group->tasks()->create($data);
         $task->load(['author', 'assignedTo']);
 
+        if($task->assignedTo->id !== $task->author->id) {
+            $task->assignedTo->notify(new TaskAssigned($task));
+        }
+
         return response()->json(['task' => $task], 201);
     }
 
@@ -63,6 +69,10 @@ class TaskController extends Controller
         $task = Task::findOrFail($id);
         $task->update($data);
         $task->load(['author', 'assignedTo']);
+
+        if($task->assignedTo->id !== auth()->user()->id) {
+            $task->assignedTo->notify(new TaskUpdated($task));
+        }
         return response()->json(['task' => $task], 200);
 
     }
@@ -73,7 +83,13 @@ class TaskController extends Controller
     public function destroy(DeleteRequest $request, $groupId,string $id):JsonResponse
     {
         $task = Task::findOrFail($id);
+
         $task->delete();
+
+        if($task->assignedTo->id !== auth()->user()->id) {
+            $task->assignedTo->notify(new Taskdeleted($task));
+        }
+
         return response()->json(['message' => 'Task deleted successfully'], 200);
         //
     }
