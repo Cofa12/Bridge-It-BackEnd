@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Task\TaskController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\auth\AuthController;
@@ -54,10 +55,14 @@ Route::get('/user', function (Request $request) {
         });
         Route::get('confirm/Invitation',[GroupController::class,'acceptInvitation'])->name('acceptGroupInvitation');
         Route::post('/groups/join/fromLink',[GroupController::class,'joinFromLink'])->name('');
+
+        Route::apiResource('{groupId}/tasks', TaskController::class)->middleware('isFoundGroup');
     });
     Route::get('confirm/Invitation/link/{groupId}/{adminId}',[GroupController::class,'joinView'])->name('joinViewLink');
 
-
+Route::get('',function (){
+    return "please login to access the API";
+})->name('login');
 
 
 

@@ -87,14 +87,14 @@ class GroupController extends Controller
 //            ]
 //        );
 
-        $link=$this->linkCreation($group->id, $user->getAuthIdentifier());
+//        $link=$this->linkCreation($group->id, $user->getAuthIdentifier());
 
-        $user->groups()->attach($group->id);
+        $user->groups()->attach($group->id,['position'=>'admin']);
 
         return response()->json([
             'status'=>true,
             'group'=>$group,
-            'link'=>$link,
+//            'link'=>$link,
         ],201);
 
     }

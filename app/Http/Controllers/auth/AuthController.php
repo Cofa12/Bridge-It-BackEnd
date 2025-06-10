@@ -31,6 +31,7 @@ class AuthController extends Controller
         $data=$request->validated();
         $data['type'] = $request->type != '' ? $request->type : 'regular';
         $data['phone'] =  $request->phone != '' ? $request->phone : null;
+        $data['email_verified_at'] = now();
         try {
             DB::beginTransaction();
             $user = User::create($data);
