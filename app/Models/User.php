@@ -71,4 +71,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(UserToken::class);
     }
+
+    public function tasks():HasMany
+    {
+        return $this->hasMany(Task::class,'author_id');
+    }
+
+    public function assignedTasks():HasMany
+    {
+        return $this->hasMany(Task::class,'assigned_to');
+    }
 }

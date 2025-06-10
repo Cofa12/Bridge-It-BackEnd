@@ -16,9 +16,7 @@ class isFoundGroup
      */
     public function handle(Request $request, Closure $next): Response
     {
-//        dd($request->all());
-        $groupId=$request->input('groupId');
-//        dd($groupId);
+        $groupId=$request->groupId;
         $group=Group::find($groupId);
         if(!$group){
             return response([
@@ -26,6 +24,7 @@ class isFoundGroup
                 'message'=>'group not found'
             ],404);
         }
+        $request->attributes->set('group', $group);
         return $next($request);
     }
 }
