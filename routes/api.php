@@ -48,6 +48,7 @@ Route::get('/user', function (Request $request) {
         Route::post('/groups/store',[GroupController::class,'store']);
         Route::post('/groups/searchedGroups',[GroupController::class,'searchUsingName']);
         Route::get('/groups/{id}',[GroupController::class,'getGroupWithID']);
+        Route::get('/groups/{groupId}/members',[GroupController::class,'getGroupMembers']);
         Route::group(['middleware'=>['isFoundGroup','isAdmin']],function(){
             Route::delete('/groups/destroy',[GroupController::class,'destroy']);
             Route::put('/groups/update',[GroupController::class,'update']);
@@ -57,6 +58,7 @@ Route::get('/user', function (Request $request) {
         Route::post('/groups/join/fromLink',[GroupController::class,'joinFromLink'])->name('');
 
         Route::apiResource('{groupId}/tasks', TaskController::class)->middleware('isFoundGroup');
+        Route::post('{groupId}/tasks/updateStatus',[TaskController::class,'updateTaskStatus'])->middleware('isFoundGroup');
     });
     Route::get('confirm/Invitation/link/{groupId}/{adminId}',[GroupController::class,'joinView'])->name('joinViewLink');
 

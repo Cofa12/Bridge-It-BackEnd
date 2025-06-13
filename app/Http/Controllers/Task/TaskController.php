@@ -67,6 +67,7 @@ class TaskController extends Controller
     {
         $data = $request->validated();
         $task = Task::findOrFail($id);
+
         $task->update($data);
         $task->load(['author', 'assignedTo']);
 
@@ -74,6 +75,19 @@ class TaskController extends Controller
             $task->assignedTo->notify(new TaskUpdated($task));
         }
         return response()->json(['task' => $task], 200);
+
+    }
+
+    public function updateTaskStatus(Request $request ,$TaskId):JsonResponse
+    {
+        $validatedData = $request->validate([
+            'status' => 'required|string|in:ToDo,Ongoing,Done,Canceled'
+        ]);
+        $task = Task::findOrFail($TaskId);
+        $task->status = request('status');
+        $task->save();
+
+        return response()->json(['message' => 'Task status updated successfully', 'task' => $task], 200);
 
     }
 
