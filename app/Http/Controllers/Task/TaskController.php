@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\TaskRequest\DeleteRequest;
 use App\Http\Requests\TaskRequest\StoreRequest;
 use App\Http\Requests\TaskRequest\UpdateRequest;
+use App\Models\Group;
 use App\Models\Task;
 use App\Notifications\Tasks\Taskdeleted;
 use App\Notifications\Tasks\TaskUpdated;
@@ -67,7 +68,7 @@ class TaskController extends Controller
     {
         $data = $request->validated();
         $task = Task::findOrFail($id);
-
+        $task->Urgency = $data['Urgency'];
         $task->update($data);
         $task->load(['author', 'assignedTo']);
 
@@ -78,7 +79,7 @@ class TaskController extends Controller
 
     }
 
-    public function updateTaskStatus(Request $request ,$TaskId):JsonResponse
+    public function updateTaskStatus(Request $request ,$TaskId,$groupId):JsonResponse
     {
         $validatedData = $request->validate([
             'status' => 'required|string|in:ToDo,Ongoing,Done,Canceled'
@@ -106,5 +107,23 @@ class TaskController extends Controller
 
         return response()->json(['message' => 'Task deleted successfully'], 200);
         //
+    }
+
+    public function getTasksByUrgency($groupId,$Urgency): JsonResponse
+    {
+
+        $validator = validator()->make(['Urgency' => $Urgency], [
+            'Urgency' => 'required|in:Later,Normal,Urgent',
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+        $group = Group::findOrFail($groupId);
+        $tasks = $group->tasks()->where('Urgency', $Urgency)->with(['author', 'assignedTo'])->get();
+
+        return response()->json(['tasks' => $tasks], 200);
     }
 }
