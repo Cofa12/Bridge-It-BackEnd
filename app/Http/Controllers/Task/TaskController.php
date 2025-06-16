@@ -64,10 +64,9 @@ class TaskController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateRequest $request ,$groupId, $id):JsonResponse
+    public function update(UpdateRequest $request , string $groupId,Task $task):JsonResponse
     {
         $data = $request->validated();
-        $task = Task::findOrFail($id);
         $task->Urgency = $data['Urgency'];
         $task->update($data);
         $task->load(['author', 'assignedTo']);

@@ -14,11 +14,10 @@ class Task extends Model
         'title',
         'description',
         'status',
-        'level',
+        'Urgency',
         'author_id',
         'assigned_to',
         'group_id',
-        'start_date',
         'deadline_date'
     ];
     /**
