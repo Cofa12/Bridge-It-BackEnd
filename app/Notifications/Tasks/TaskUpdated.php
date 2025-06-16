@@ -18,7 +18,7 @@ class TaskUpdated extends Notification
     /**
      * Create a new notification instance.
      */
-    public function __construct($task, $updater)
+    public function __construct($task)
     {
         $this->task = $task;
     }

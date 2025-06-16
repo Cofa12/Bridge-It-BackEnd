@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('tasks', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->enum('status',['planning','inProgress','done','canceled'])->default('planning');
+            $table->enum('status',['ToDo','Ongoing','Done','Canceled'])->default('ToDo');
+            $table->enum('Urgency',['Later','Normal','Urgent'])->default('Later');
             $table->text('description')->nullable();
             $table->date('start_date')->nullable();
             $table->date('deadline_date');

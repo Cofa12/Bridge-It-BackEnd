@@ -37,11 +37,10 @@ class StoreRequest extends FormRequest
     {
         return [
             'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'status' => 'nullable|string|in:pending,completed,in_progress',
-            'assigned_to' => 'exists:users,id',
-            'start_date' => 'required|date',
-            'deadline_date' => 'required|date|after_or_equal:start_date',
+            'description' => 'required|nullable|string',
+            'Urgency' => 'string|in:Later,Normal,Urgent',
+            'assigned_to' => 'required|exists:users,id',
+            'deadline_date' => 'required|date|after_or_equal:now',
             'group_id' => 'required|exists:groups,id'
         ];
     }
@@ -49,19 +48,18 @@ class StoreRequest extends FormRequest
     public function messages():array
     {
         return [
-            'title.required' => 'The title is required.',
+            'title.required' => 'The title field is required.',
             'title.string' => 'The title must be a string.',
             'title.max' => 'The title may not be greater than 255 characters.',
             'description.string' => 'The description must be a string.',
-            'status.in' => 'The status must be one of the following: pending, completed, in_progress.',
-            'assigned_to.exists' => 'The assigned user must exist in the users table.',
-            'start_date.required' => 'The start date is required.',
-            'deadline_date.required' => 'The deadline date is required.',
-            'deadline_date.after_or_equal' => 'The deadline date must be after or equal to the start date.',
-            'group_id.required' => 'The group ID is required.',
-            'group_id.exists' => 'The selected group does not exist.',
-            'author_id.required' => 'The author ID is required.',
-            'author_id.exists' => 'The selected author does not exist.',
+            'Urgency.string' => 'The urgency must be a string.',
+            'Urgency.in' => 'The urgency must be one of the following: Later, Normal, Urgent.',
+            'assigned_to.exists' => 'The selected assigned user does not exist.',
+            'deadline_date.required' => 'The deadline date field is required.',
+            'deadline_date.date' => 'The deadline date must be a valid date.',
+            'deadline_date.after_or_equal' => 'The deadline date must be a date after or equal to today.',
+            'group_id.required' => 'The group ID field is required.',
+            'group_id.exists' => 'The selected group does not exist.'
         ];
 
     }

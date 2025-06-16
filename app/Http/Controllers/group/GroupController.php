@@ -210,8 +210,12 @@ class GroupController extends Controller
 
     public function getGroupMembers(int $groupId): \Illuminate\Http\JsonResponse
     {
-        $group=Group::find($groupId);
-        return $group->users;
+        $group=Group::findOrFail($groupId);
+        $members = $group->users;
+        return response()->json([
+            'status'=>true,
+            'members'=>$members,
+        ],200);
     }
 
     public function sendJoinInvitation(Request $request): \Illuminate\Http\JsonResponse
