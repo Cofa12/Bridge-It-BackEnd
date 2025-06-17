@@ -59,7 +59,7 @@ Route::get('/user', function (Request $request) {
 
         Route::apiResource('{groupId}/tasks', TaskController::class)->middleware('isFoundGroup');
         Route::get('/{groupId}/tasksBy/{Urgency}',[TaskController::class,'getTasksByUrgency']);
-        Route::post('{groupId}/tasks/updateStatus/{TaskId}',[TaskController::class,'updateTaskStatus'])->middleware('isFoundGroup');
+        Route::post('/tasks/updateStatus/{TaskId}',[TaskController::class,'updateTaskStatus']);
     });
     Route::get('confirm/Invitation/link/{groupId}/{adminId}',[GroupController::class,'joinView'])->name('joinViewLink');
 

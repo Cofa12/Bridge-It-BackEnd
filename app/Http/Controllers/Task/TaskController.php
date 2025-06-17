@@ -78,7 +78,7 @@ class TaskController extends Controller
 
     }
 
-    public function updateTaskStatus(Request $request ,$TaskId,$groupId):JsonResponse
+    public function updateTaskStatus(Request $request ,$TaskId):JsonResponse
     {
         $validatedData = $request->validate([
             'status' => 'required|string|in:ToDo,Ongoing,Done,Canceled'
