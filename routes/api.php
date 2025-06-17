@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Task\ChallengeController;
 use App\Http\Controllers\Task\TaskController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -62,6 +63,11 @@ Route::get('/user', function (Request $request) {
         Route::post('{groupId}/tasks/updateStatus/{TaskId}',[TaskController::class,'updateTaskStatus'])->middleware('isFoundGroup');
     });
     Route::get('confirm/Invitation/link/{groupId}/{adminId}',[GroupController::class,'joinView'])->name('joinViewLink');
+    Route::post('task/challenge',[ChallengeController::class,'store']);
+    Route::put('task/challenge/{id}/edit',[ChallengeController::class,'update']);
+    Route::delete('task/challenge/{id}',[ChallengeController::class,'destroy']);
+    Route::get('task/challenges/{task_id}',[ChallengeController::class,'index']);
+
 
 Route::get('',function (){
     return "please login to access the API";
