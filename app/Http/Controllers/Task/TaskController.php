@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Task;
 
+use App\Exceptions\NotFoundException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\TaskRequest\DeleteRequest;
 use App\Http\Requests\TaskRequest\StoreRequest;
@@ -13,6 +14,7 @@ use App\Notifications\Tasks\TaskUpdated;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Notifications\Tasks\TaskAssigned;
+use Illuminate\Support\Facades\Http;
 
 class TaskController extends Controller
 {
@@ -125,5 +127,30 @@ class TaskController extends Controller
         $tasks = $group->tasks()->where('Urgency', $Urgency)->with(['author', 'assignedTo'])->get();
 
         return response()->json(['tasks' => $tasks], 200);
+    }
+
+
+    public function makeDocs($id):JsonResponse
+    {
+        $group = Group::find($id);
+        if(!$group)
+            throw new NotFoundException('group');
+
+        $data = [
+            'tasks' => $group->tasks->map(function ($task) {
+                $taskDescription = $task->title;
+
+                foreach ($task->challenges as $challenge) {
+                    $taskDescription .= ' and these the challenges with solution challenges ';
+                    $taskDescription .= $challenge->content;
+                    $taskDescription .= ' and the solution ';
+                    $taskDescription .= $challenge->solution->contents ?? 'no solution';
+                }
+
+                return ['task' => $taskDescription];
+            })->values()->all() // optional: make it a clean array
+        ];
+
+        return response()->json($data, 200);
     }
 }

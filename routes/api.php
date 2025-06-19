@@ -67,6 +67,7 @@ Route::get('/user', function (Request $request) {
     Route::put('task/challenge/{id}/edit',[ChallengeController::class,'update']);
     Route::delete('task/challenge/{id}',[ChallengeController::class,'destroy']);
     Route::get('task/challenges/{task_id}',[ChallengeController::class,'index']);
+    Route::post('group/{id}/docs',[TaskController::class,'makeDocs']);
 
 
 Route::get('',function (){
