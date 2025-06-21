@@ -266,4 +266,13 @@ class AuthController extends Controller
             'message'=>'Password has been changed successfully'
         ],200);
     }
+
+    public function getAllUsers(): JsonResponse
+    {
+        $users = User::where('type', '!=', 'admin')->get();
+        return response()->json([
+            'status' => true,
+            'users' => $users
+        ], 200);
+    }
 }

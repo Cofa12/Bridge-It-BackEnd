@@ -211,7 +211,13 @@ class GroupController extends Controller
     public function getGroupMembers(int $groupId): \Illuminate\Http\JsonResponse
     {
         $group=Group::findOrFail($groupId);
-        $members = $group->users;
+        $members = $group->users->map(function ($user) {
+            return [
+                'id' => $user->id,
+                'name' => $user->name,
+                'avatar' => $user->avatar,
+            ];
+        })->toArray();
         return response()->json([
             'status'=>true,
             'members'=>$members,
