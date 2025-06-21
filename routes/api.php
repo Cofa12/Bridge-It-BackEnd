@@ -49,7 +49,10 @@ Route::get('/user', function (Request $request) {
         Route::post('/groups/store',[GroupController::class,'store']);
         Route::post('/groups/searchedGroups',[GroupController::class,'searchUsingName']);
         Route::get('/groups/{id}',[GroupController::class,'getGroupWithID']);
-        Route::get('/groups/{groupId}/members',[GroupController::class,'getGroupMembers']);
+        Route::get('/groups/{groupId}/members',[TaskController::class,'getGroupMembers']);
+        Route::get('/groups/system/users',[GroupController::class,'getAllUsers']);
+        Route::get('/groups/system/users/{name}',[GroupController::class,'searchUsersByName']);
+        Route::get('/groups/{groupId}/add/user/{userId}',[GroupController::class,'addUserToGroup']);
         Route::group(['middleware'=>['isFoundGroup','isAdmin']],function(){
             Route::delete('/groups/destroy',[GroupController::class,'destroy']);
             Route::put('/groups/update',[GroupController::class,'update']);

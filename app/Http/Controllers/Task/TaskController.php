@@ -152,4 +152,21 @@ class TaskController extends Controller
 
         return response()->json($data, 200);
     }
+
+    public function getGroupMembers(int $groupId): \Illuminate\Http\JsonResponse
+    {
+        $group=Group::findOrFail($groupId);
+        $members = $group->users->map(function ($user) {
+            return [
+                'id' => $user->id,
+                'name' => $user->name,
+                'avatar' => $user->avatar,
+            ];
+        })->toArray();
+        return response()->json([
+            'status'=>true,
+            'members'=>$members,
+        ],200);
+    }
+
 }

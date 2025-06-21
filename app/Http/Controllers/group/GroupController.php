@@ -208,22 +208,6 @@ class GroupController extends Controller
 //
 //    }
 
-    public function getGroupMembers(int $groupId): \Illuminate\Http\JsonResponse
-    {
-        $group=Group::findOrFail($groupId);
-        $members = $group->users->map(function ($user) {
-            return [
-                'id' => $user->id,
-                'name' => $user->name,
-                'avatar' => $user->avatar,
-            ];
-        })->toArray();
-        return response()->json([
-            'status'=>true,
-            'members'=>$members,
-        ],200);
-    }
-
     public function sendJoinInvitation(Request $request): \Illuminate\Http\JsonResponse
     {
         $invitationMails = $request->input('membersMails');
@@ -310,5 +294,69 @@ class GroupController extends Controller
             'message'=>'wait the confirmation from Admin'
         ],200);
 
+    }
+
+    public function getAllUsers(): JsonResponse
+    {
+        $users = User::where('type', '!=', 'admin')->get();
+        $response = $users->map(function ($user) {
+            return [
+                'id' => $user->id,
+                'name' => $user->name,
+
+                'avatar' => $user->avatar,
+            ];
+        });
+        return response()->json([
+            'status' => true,
+            'users' => $response
+        ], 200);
+    }
+
+    public function searchUsersByName($name): JsonResponse
+    {
+        $users = User::where('name', 'like', '%' . $name . '%')->get();
+        if ($users->isEmpty()) {
+            return response()->json(['status' => false, 'message' => 'No matching users found'], 404);
+        }
+        $response = $users->map(function ($user) {
+            return [
+                'id' => $user->id,
+                'name' => $user->name,
+                'avatar' => $user->avatar,
+            ];
+        });
+        return response()->json([
+            'status' => true,
+            'users' => $response
+        ], 200);
+    }
+
+    public function addUserToGroup ($groupId,$userId): JsonResponse
+    {
+
+        $user = User::find($userId);
+        if (!$user) {
+            return response()->json(['status' => false, 'message' => 'User not found'], 404);
+        }
+
+        $group = Group::find($groupId);
+        if (!$group) {
+            return response()->json(['status' => false, 'message' => 'No group found'], 404);
+        }
+        if($group->users()->where('group_user.user_id', $user->id)->exists()) {
+            return response()->json(['status' => false, 'message' => 'User already in group'], 409);
+        }
+        $group->users()->attach($user->id, ['position' => 'member']);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'User added to group successfully',
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'avatar' => $user->avatar,
+            ]
+        ], 200);
     }
 }
