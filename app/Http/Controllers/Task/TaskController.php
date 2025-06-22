@@ -9,6 +9,7 @@ use App\Http\Requests\TaskRequest\StoreRequest;
 use App\Http\Requests\TaskRequest\UpdateRequest;
 use App\Models\Group;
 use App\Models\Task;
+use App\Models\User;
 use App\Notifications\Tasks\Taskdeleted;
 use App\Notifications\Tasks\TaskUpdated;
 use Illuminate\Http\JsonResponse;
@@ -80,12 +81,29 @@ class TaskController extends Controller
 
     }
 
-    public function updateTaskStatus(Request $request ,$TaskId):JsonResponse
+    public function updateTaskStatus(Request $request ,$groupId,$TaskId):JsonResponse
     {
+
         $validatedData = $request->validate([
             'status' => 'required|string|in:ToDo,Ongoing,Done,Canceled'
         ]);
+        $userId= auth()->user()->id;
+        $user=User::find($userId);
+
+
+        $checkIfUserInGroup = $user->groups()->where('groups.id', $groupId)->exists();
+        if(!$checkIfUserInGroup) {
+            return response()->json(['message' => 'You are not a member of this group'], 403);
+        }
+
+
         $task = Task::findOrFail($TaskId);
+        $checkIfTaskInGroup = $task->group_id == $groupId;
+        if(!$checkIfTaskInGroup) {
+            return response()->json(['message' => 'This task does not belong to the group'], 404);
+        }
+
+
         $task->status = request('status');
         $task->save();
 
