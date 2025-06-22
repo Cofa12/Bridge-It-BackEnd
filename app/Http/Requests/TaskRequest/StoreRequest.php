@@ -38,7 +38,7 @@ class StoreRequest extends FormRequest
         return [
             'title' => 'required|string|max:255',
             'description' => 'required|nullable|string',
-            'Urgency' => 'string|in:Later,Normal,Urgent',
+            'Urgency' => 'required|string|in:Later,Normal,Urgent',
             'assigned_to' => 'required|exists:users,id',
             'deadline_date' => 'required|date|after_or_equal:now',
             'group_id' => 'required|exists:groups,id'

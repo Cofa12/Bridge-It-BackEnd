@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Task\ChallengeController;
 use App\Http\Controllers\Task\TaskController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -48,7 +49,10 @@ Route::get('/user', function (Request $request) {
         Route::post('/groups/store',[GroupController::class,'store']);
         Route::post('/groups/searchedGroups',[GroupController::class,'searchUsingName']);
         Route::get('/groups/{id}',[GroupController::class,'getGroupWithID']);
-        Route::get('/groups/{groupId}/members',[GroupController::class,'getGroupMembers']);
+        Route::get('/groups/{groupId}/members',[TaskController::class,'getGroupMembers']);
+        Route::get('/groups/system/users',[GroupController::class,'getAllUsers']);
+        Route::get('/groups/system/users/{name}',[GroupController::class,'searchUsersByName']);
+        Route::get('/groups/{groupId}/add/user/{userId}',[GroupController::class,'addUserToGroup']);
         Route::group(['middleware'=>['isFoundGroup','isAdmin']],function(){
             Route::delete('/groups/destroy',[GroupController::class,'destroy']);
             Route::put('/groups/update',[GroupController::class,'update']);
@@ -59,9 +63,15 @@ Route::get('/user', function (Request $request) {
 
         Route::apiResource('{groupId}/tasks', TaskController::class)->middleware('isFoundGroup');
         Route::get('/{groupId}/tasksBy/{Urgency}',[TaskController::class,'getTasksByUrgency']);
-        Route::post('/tasks/updateStatus/{TaskId}',[TaskController::class,'updateTaskStatus']);
+        Route::post('/{groupId}/tasks/updateStatus/{TaskId}',[TaskController::class,'updateTaskStatus']);
     });
     Route::get('confirm/Invitation/link/{groupId}/{adminId}',[GroupController::class,'joinView'])->name('joinViewLink');
+    Route::post('task/challenge',[ChallengeController::class,'store']);
+    Route::put('task/challenge/{id}/edit',[ChallengeController::class,'update']);
+    Route::delete('task/challenge/{id}',[ChallengeController::class,'destroy']);
+    Route::get('task/challenges/{task_id}',[ChallengeController::class,'index']);
+    Route::post('group/{id}/docs',[TaskController::class,'makeDocs']);
+
 
 Route::get('',function (){
     return "please login to access the API";

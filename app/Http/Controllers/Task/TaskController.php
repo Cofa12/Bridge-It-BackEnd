@@ -2,17 +2,20 @@
 
 namespace App\Http\Controllers\Task;
 
+use App\Exceptions\NotFoundException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\TaskRequest\DeleteRequest;
 use App\Http\Requests\TaskRequest\StoreRequest;
 use App\Http\Requests\TaskRequest\UpdateRequest;
 use App\Models\Group;
 use App\Models\Task;
+use App\Models\User;
 use App\Notifications\Tasks\Taskdeleted;
 use App\Notifications\Tasks\TaskUpdated;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Notifications\Tasks\TaskAssigned;
+use Illuminate\Support\Facades\Http;
 
 class TaskController extends Controller
 {
@@ -78,12 +81,29 @@ class TaskController extends Controller
 
     }
 
-    public function updateTaskStatus(Request $request ,$TaskId):JsonResponse
+    public function updateTaskStatus(Request $request ,$groupId,$TaskId):JsonResponse
     {
+
         $validatedData = $request->validate([
             'status' => 'required|string|in:ToDo,Ongoing,Done,Canceled'
         ]);
+        $userId= auth()->user()->id;
+        $user=User::find($userId);
+
+
+        $checkIfUserInGroup = $user->groups()->where('groups.id', $groupId)->exists();
+        if(!$checkIfUserInGroup) {
+            return response()->json(['message' => 'You are not a member of this group'], 403);
+        }
+
+
         $task = Task::findOrFail($TaskId);
+        $checkIfTaskInGroup = $task->group_id == $groupId;
+        if(!$checkIfTaskInGroup) {
+            return response()->json(['message' => 'This task does not belong to the group'], 404);
+        }
+
+
         $task->status = request('status');
         $task->save();
 
@@ -125,4 +145,46 @@ class TaskController extends Controller
 
         return response()->json(['tasks' => $tasks], 200);
     }
+
+
+    public function makeDocs($id):JsonResponse
+    {
+        $group = Group::find($id);
+        if(!$group)
+            throw new NotFoundException('group');
+
+        $data = [
+            'tasks' => $group->tasks->map(function ($task) {
+                $taskDescription = $task->title;
+
+                foreach ($task->challenges as $challenge) {
+                    $taskDescription .= ' and these the challenges with solution challenges ';
+                    $taskDescription .= $challenge->content;
+                    $taskDescription .= ' and the solution ';
+                    $taskDescription .= $challenge->solution->contents ?? 'no solution';
+                }
+
+                return ['task' => $taskDescription];
+            })->values()->all() // optional: make it a clean array
+        ];
+
+        return response()->json($data, 200);
+    }
+
+    public function getGroupMembers(int $groupId): \Illuminate\Http\JsonResponse
+    {
+        $group=Group::findOrFail($groupId);
+        $members = $group->users->map(function ($user) {
+            return [
+                'id' => $user->id,
+                'name' => $user->name,
+                'avatar' => $user->avatar,
+            ];
+        })->toArray();
+        return response()->json([
+            'status'=>true,
+            'members'=>$members,
+        ],200);
+    }
+
 }
