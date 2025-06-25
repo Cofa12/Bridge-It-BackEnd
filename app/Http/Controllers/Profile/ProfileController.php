@@ -39,7 +39,7 @@ class ProfileController extends Controller
         }
 //        dd($path);
         $path = $request->file('avatar')->store('avatars', 'public');
-        $fullPath = asset('storage/' .$path);
+//        $fullPath = asset('storage/' .$path);
 
         $user->avatar = $path;
         $user->save();
@@ -50,7 +50,7 @@ class ProfileController extends Controller
                 'name' => $user->name,
                 'email' => $user->email,
                 'phone' => $user->phone,
-                'avatar' => $fullPath,
+                'avatar' => $user->avatar,
                 'bio' => $user->bio,
             ],
             'message' => 'Avatar updated successfully.',
