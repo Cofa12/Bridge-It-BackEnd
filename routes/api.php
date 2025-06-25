@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Profile\ProfileController;
 use App\Http\Controllers\Task\ChallengeController;
 use App\Http\Controllers\Task\TaskController;
 use Illuminate\Http\Request;
@@ -64,6 +65,12 @@ Route::get('/user', function (Request $request) {
         Route::apiResource('{groupId}/tasks', TaskController::class)->middleware('isFoundGroup');
         Route::get('/{groupId}/tasksBy/{Urgency}',[TaskController::class,'getTasksByUrgency']);
         Route::post('/{groupId}/tasks/updateStatus/{TaskId}',[TaskController::class,'updateTaskStatus']);
+
+        Route::get('/user/profile',[ProfileController::class,'index']);
+        Route::put('/user/profile/updateAvatar',[ProfileController::class,'updateAvatar']);
+        Route::put('/user/profile/update',[ProfileController::class,'update']);
+        Route::put('/user/profile/updatePassword',[ProfileController::class,'updatePassword']);
+        Route::delete('/user/profile/deleteAccount',[ProfileController::class,'deleteAccount']);
     });
     Route::get('confirm/Invitation/link/{groupId}/{adminId}',[GroupController::class,'joinView'])->name('joinViewLink');
     Route::post('task/challenge',[ChallengeController::class,'store']);
